@@ -1,8 +1,10 @@
 import { drizzle } from "drizzle-orm/bun-sqlite";
 import { Database } from "bun:sqlite";
-import * as schema from "./schema";
+import * as schema from "./database/schema";
 
-const sqlite = new Database("steam-eye.db");
-export const db = drizzle(sqlite, { schema });
+export type DatabaseClient = ReturnType<typeof createDatabase>;
 
-export * from "./schema";
+export const createDatabase = (path: string) => {
+  const sqlite = new Database(path);
+  return drizzle(sqlite, { schema });
+};

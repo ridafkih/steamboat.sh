@@ -4,19 +4,20 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./schema": "./src/schema.ts"
+    "./schema": "./src/database/schema.ts"
   },
   "scripts": {
-    "dev": "bun run --watch src/index.ts",
-    "build": "bun build src/index.ts --outdir dist --target bun",
+    "push": "drizzle-kit push",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "drizzle-orm": "^0.38.0"
+    "drizzle-orm": "0.45.1"
   },
   "devDependencies": {
     "@steam-eye/typescript-config": "workspace:*",
-    "drizzle-kit": "^0.30.0",
-    "typescript": "^5"
+    "drizzle-kit": "0.31.8",
+    "typescript": "5.9.3"
   }
 }
