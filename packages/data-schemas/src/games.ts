@@ -18,6 +18,23 @@ export const createGameSchema = type({
   "isFree?": "boolean",
 });
 
+export const compareGamesSchema = type({
+  targetUserId: "number",
+});
+
+export const hideGameSchema = type({
+  steamAccountId: "number",
+  appId: "number",
+  hidden: "boolean",
+});
+
+export const listUserGamesSchema = type({
+  userId: "number",
+});
+
 export type GameId = typeof gameIdSchema.infer;
 export type SearchGames = typeof searchGamesSchema.infer;
 export type CreateGame = typeof createGameSchema.infer;
+export type CompareGames = typeof compareGamesSchema.infer;
+export type HideGame = typeof hideGameSchema.infer;
+export type ListUserGames = typeof listUserGamesSchema.infer;

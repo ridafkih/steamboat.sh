@@ -16,6 +16,7 @@ export const users = sqliteTable("users", {
 
 export const usersRelations = relations(users, ({ many }) => ({
   steamAccounts: many(steamAccounts),
+  serverMemberships: many(discordServerMembers),
 }));
 
 export const steamAccounts = sqliteTable("steam_accounts", {
@@ -95,3 +96,69 @@ export const ownedGamesRelations = relations(ownedGames, ({ one }) => ({
     references: [games.appId],
   }),
 }));
+
+export const discordServers = sqliteTable("discord_servers", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  iconUrl: text("icon_url"),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const discordServersRelations = relations(discordServers, ({ many }) => ({
+  members: many(discordServerMembers),
+}));
+
+export const discordServerMembers = sqliteTable(
+  "discord_server_members",
+  {
+    discordServerId: text("discord_server_id")
+      .notNull()
+      .references(() => discordServers.id, { onDelete: "cascade" }),
+    userId: integer("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    joinedAt: integer("joined_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (table) => [primaryKey({ columns: [table.discordServerId, table.userId] })]
+);
+
+export const discordServerMembersRelations = relations(discordServerMembers, ({ one }) => ({
+  server: one(discordServers, {
+    fields: [discordServerMembers.discordServerId],
+    references: [discordServers.id],
+  }),
+  user: one(users, {
+    fields: [discordServerMembers.userId],
+    references: [users.id],
+  }),
+}));
+
+export const keyValue = sqliteTable("key_value", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull(),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
+export const apiKeys = sqliteTable("api_keys", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  name: text("name").notNull(),
+  hash: text("hash").notNull(),
+  oneTimeUse: integer("one_time_use", { mode: "boolean" }).notNull().default(false),
+  used: integer("used", { mode: "boolean" }).notNull().default(false),
+  createdAt: integer("created_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+  lastUsedAt: integer("last_used_at", { mode: "timestamp" }),
+});

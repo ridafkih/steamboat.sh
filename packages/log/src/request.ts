@@ -23,7 +23,7 @@ export type RequestLogger = {
   emit: (fields?: { statusCode: number; durationMs?: number }) => void;
 };
 
-export function createRequestLogger(logger: Logger, initialContext?: Partial<RequestContext>): RequestLogger {
+export const createRequestLogger = (logger: Logger, initialContext?: Partial<RequestContext>): RequestLogger => {
   const context: RequestContext = {
     requestId: crypto.randomUUID(),
     method: "",
@@ -33,19 +33,19 @@ export function createRequestLogger(logger: Logger, initialContext?: Partial<Req
   };
 
   return {
-    set(key, value) {
+    set: (key, value) => {
       context[key] = value;
     },
 
-    setAll(fields) {
+    setAll: (fields) => {
       Object.assign(context, fields);
     },
 
-    get(key) {
+    get: (key) => {
       return context[key];
     },
 
-    emit(fields) {
+    emit: (fields) => {
       const durationMs = fields?.durationMs ?? Date.now() - context.startTime;
       const { startTime, ...rest } = context;
 
@@ -58,4 +58,4 @@ export function createRequestLogger(logger: Logger, initialContext?: Partial<Req
       });
     },
   };
-}
+};
