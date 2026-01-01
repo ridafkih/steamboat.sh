@@ -14,6 +14,37 @@ Default to using Bun instead of Node.js.
 - Use `bunx <package> <command>` instead of `npx <package> <command>`
 - Bun automatically loads .env, so don't use dotenv.
 
+## Code Style
+
+- **No abbreviated variable names.** Use full, self-descriptive names.
+  - `database` not `db`
+  - `requestLogger` not `reqLog`
+  - `context` not `ctx`
+  - `response` not `res`
+  - `request` not `req`
+  - `error` not `err`
+  - `message` not `msg`
+  - `configuration` not `config` or `cfg`
+- **No type assertions.** Avoid `as Type` or non-null assertions `!`. Fix the types properly instead.
+- **Self-descriptive code.** Names should make the code readable without comments.
+- **No unnecessary comments.** Code should be self-explanatory.
+
+## Project Structure
+
+Follow the monorepo patterns from `keeper.sh`:
+
+- Centralized TypeScript config in `packages/typescript-config`
+- Shared packages export via `workspace:*` protocol
+- Each package has minimal `tsconfig.json` extending the base
+- Factory functions over singletons (e.g., `createDatabase()` not a global `db`)
+
+## Libraries
+
+- **Validation:** Arktype (not Zod)
+- **API:** oRPC with `@orpc/server` and `@orpc/client`
+- **Database:** Drizzle ORM with `bun:sqlite`
+- **Logging:** Pino with wide events pattern (see `packages/log`)
+
 ## APIs
 
 - `Bun.serve()` supports WebSockets, HTTPS, and routes. Don't use `express`.
@@ -38,74 +69,6 @@ test("hello world", () => {
 
 ## Frontend
 
-Use HTML imports with `Bun.serve()`. Don't use `vite`. HTML imports fully support React, CSS, Tailwind.
-
-Server:
-
-```ts#index.ts
-import index from "./index.html"
-
-Bun.serve({
-  routes: {
-    "/": index,
-    "/api/users/:id": {
-      GET: (req) => {
-        return new Response(JSON.stringify({ id: req.params.id }));
-      },
-    },
-  },
-  // optional websocket support
-  websocket: {
-    open: (ws) => {
-      ws.send("Hello, world!");
-    },
-    message: (ws, message) => {
-      ws.send(message);
-    },
-    close: (ws) => {
-      // handle close
-    }
-  },
-  development: {
-    hmr: true,
-    console: true,
-  }
-})
-```
-
-HTML files can import .tsx, .jsx or .js files directly and Bun's bundler will transpile & bundle automatically. `<link>` tags can point to stylesheets and Bun's CSS bundler will bundle.
-
-```html#index.html
-<html>
-  <body>
-    <h1>Hello, world!</h1>
-    <script type="module" src="./frontend.tsx"></script>
-  </body>
-</html>
-```
-
-With the following `frontend.tsx`:
-
-```tsx#frontend.tsx
-import React from "react";
-import { createRoot } from "react-dom/client";
-
-// import .css files directly and it works
-import './index.css';
-
-const root = createRoot(document.body);
-
-export default function Frontend() {
-  return <h1>Hello, world!</h1>;
-}
-
-root.render(<Frontend />);
-```
-
-Then, run index.ts
-
-```sh
-bun --hot ./index.ts
-```
+Use Vite for the web package.
 
 For more information, read the Bun API docs in `node_modules/bun-types/docs/**.mdx`.
