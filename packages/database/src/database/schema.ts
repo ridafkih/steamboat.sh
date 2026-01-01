@@ -77,6 +77,7 @@ export const ownedGames = sqliteTable(
     playtimeMac: integer("playtime_mac").default(0),
     playtimeLinux: integer("playtime_linux").default(0),
     lastPlayedAt: integer("last_played_at", { mode: "timestamp" }),
+    hidden: integer("hidden", { mode: "boolean" }).default(false),
     syncedAt: integer("synced_at", { mode: "timestamp" })
       .notNull()
       .$defaultFn(() => new Date()),
