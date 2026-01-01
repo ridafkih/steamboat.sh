@@ -1,0 +1,8 @@
+{
+  "name": "@steam-eye/typescript-config",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./tsconfig.json"
+  }
+}
