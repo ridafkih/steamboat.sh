@@ -1,0 +1,19 @@
+{
+  "name": "@steam-eye/bot",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun run --hot src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "start": "bun run dist/index.js",
+    "types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@steam-eye/database": "workspace:*",
+    "discord.js": "^14.16.0"
+  },
+  "devDependencies": {
+    "@steam-eye/typescript-config": "workspace:*",
+    "typescript": "^5"
+  }
+}

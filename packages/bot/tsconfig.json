@@ -1,0 +1,7 @@
+{
+  "extends": "@steam-eye/typescript-config",
+  "compilerOptions": {
+    "types": ["bun-types"]
+  },
+  "include": ["src/**/*"]
+}
