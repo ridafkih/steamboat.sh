@@ -1,0 +1,21 @@
+{
+  "name": "@steam-eye/data-schemas",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./users": "./src/users.ts",
+    "./steam": "./src/steam.ts",
+    "./games": "./src/games.ts"
+  },
+  "scripts": {
+    "types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "arktype": "^2.1.0"
+  },
+  "devDependencies": {
+    "@steam-eye/typescript-config": "workspace:*",
+    "typescript": "^5"
+  }
+}
