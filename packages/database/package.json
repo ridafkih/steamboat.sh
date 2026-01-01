@@ -1,0 +1,22 @@
+{
+  "name": "@steam-eye/database",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./schema": "./src/schema.ts"
+  },
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --outdir dist --target bun",
+    "types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.38.0"
+  },
+  "devDependencies": {
+    "@steam-eye/typescript-config": "workspace:*",
+    "drizzle-kit": "^0.30.0",
+    "typescript": "^5"
+  }
+}
