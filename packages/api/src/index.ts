@@ -75,10 +75,9 @@ entry("api")
       context,
     }) => {
       const port = 3001;
-      const { ready } = await bootstrap(database);
+      await bootstrap(database);
 
       context.set("port", port);
-      context.set("bootstrap.ready", ready);
 
       Bun.serve({
         port,
@@ -96,7 +95,7 @@ entry("api")
 
           if (url.pathname === "/health") {
             requestLogger.emit({ statusCode: 200 });
-            return withCors(Response.json({ ready }));
+            return withCors(Response.json({ ok: true }));
           }
 
           if (url.pathname.startsWith("/api/auth")) {
