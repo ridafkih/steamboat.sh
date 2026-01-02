@@ -12,9 +12,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/api";
+import { config } from "@/lib/config";
 import { useLinkedAccounts } from "@/lib/hooks/use-linked-accounts";
-
-const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 export const LinkSteamAccountCard = () => {
   const { data: steamAccounts, isLoading, mutate } = useLinkedAccounts();
@@ -25,7 +24,7 @@ export const LinkSteamAccountCard = () => {
 
   const handleLinkSteam = () => {
     setIsLinking(true);
-    const linkUrl = new URL("/api/steam/link", apiBaseUrl);
+    const linkUrl = new URL("/api/steam/link", config.API_URL);
     window.location.href = linkUrl.toString();
   };
 
