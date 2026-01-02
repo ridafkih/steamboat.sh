@@ -1,17 +1,21 @@
-import { sqliteTable, text, integer, primaryKey } from "drizzle-orm/sqlite-core";
+import {
+  pgTable,
+  text,
+  integer,
+  boolean,
+  timestamp,
+  primaryKey,
+  serial,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
-export const users = sqliteTable("users", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
   discordId: text("discord_id").notNull().unique(),
   discordUsername: text("discord_username").notNull(),
   discordAvatar: text("discord_avatar"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -19,8 +23,8 @@ export const usersRelations = relations(users, ({ many }) => ({
   serverMemberships: many(discordServerMembers),
 }));
 
-export const steamAccounts = sqliteTable("steam_accounts", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const steamAccounts = pgTable("steam_accounts", {
+  id: serial("id").primaryKey(),
   userId: integer("user_id")
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
@@ -28,10 +32,8 @@ export const steamAccounts = sqliteTable("steam_accounts", {
   steamUsername: text("steam_username").notNull(),
   steamAvatar: text("steam_avatar"),
   profileUrl: text("profile_url"),
-  lastSyncedAt: integer("last_synced_at", { mode: "timestamp" }),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
+  lastSyncedAt: timestamp("last_synced_at"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 export const steamAccountsRelations = relations(steamAccounts, ({ one, many }) => ({
@@ -42,7 +44,7 @@ export const steamAccountsRelations = relations(steamAccounts, ({ one, many }) =
   ownedGames: many(ownedGames),
 }));
 
-export const games = sqliteTable("games", {
+export const games = pgTable("games", {
   appId: integer("app_id").primaryKey(),
   name: text("name").notNull(),
   iconUrl: text("icon_url"),
@@ -53,17 +55,15 @@ export const games = sqliteTable("games", {
   publishers: text("publishers"),
   genres: text("genres"),
   releaseDate: text("release_date"),
-  isFree: integer("is_free", { mode: "boolean" }).default(false),
-  cachedAt: integer("cached_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
+  isFree: boolean("is_free").default(false),
+  cachedAt: timestamp("cached_at").notNull().defaultNow(),
 });
 
 export const gamesRelations = relations(games, ({ many }) => ({
   ownedGames: many(ownedGames),
 }));
 
-export const ownedGames = sqliteTable(
+export const ownedGames = pgTable(
   "owned_games",
   {
     steamAccountId: integer("steam_account_id")
@@ -77,11 +77,9 @@ export const ownedGames = sqliteTable(
     playtimeWindows: integer("playtime_windows").default(0),
     playtimeMac: integer("playtime_mac").default(0),
     playtimeLinux: integer("playtime_linux").default(0),
-    lastPlayedAt: integer("last_played_at", { mode: "timestamp" }),
-    hidden: integer("hidden", { mode: "boolean" }).default(false),
-    syncedAt: integer("synced_at", { mode: "timestamp" })
-      .notNull()
-      .$defaultFn(() => new Date()),
+    lastPlayedAt: timestamp("last_played_at"),
+    hidden: boolean("hidden").default(false),
+    syncedAt: timestamp("synced_at").notNull().defaultNow(),
   },
   (table) => [primaryKey({ columns: [table.steamAccountId, table.appId] })]
 );
@@ -97,23 +95,19 @@ export const ownedGamesRelations = relations(ownedGames, ({ one }) => ({
   }),
 }));
 
-export const discordServers = sqliteTable("discord_servers", {
+export const discordServers = pgTable("discord_servers", {
   id: text("id").primaryKey(),
   name: text("name").notNull(),
   iconUrl: text("icon_url"),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 export const discordServersRelations = relations(discordServers, ({ many }) => ({
   members: many(discordServerMembers),
 }));
 
-export const discordServerMembers = sqliteTable(
+export const discordServerMembers = pgTable(
   "discord_server_members",
   {
     discordServerId: text("discord_server_id")
@@ -122,9 +116,7 @@ export const discordServerMembers = sqliteTable(
     userId: integer("user_id")
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
-    joinedAt: integer("joined_at", { mode: "timestamp" })
-      .notNull()
-      .$defaultFn(() => new Date()),
+    joinedAt: timestamp("joined_at").notNull().defaultNow(),
   },
   (table) => [primaryKey({ columns: [table.discordServerId, table.userId] })]
 );
@@ -140,25 +132,19 @@ export const discordServerMembersRelations = relations(discordServerMembers, ({ 
   }),
 }));
 
-export const keyValue = sqliteTable("key_value", {
+export const keyValue = pgTable("key_value", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
-export const apiKeys = sqliteTable("api_keys", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const apiKeys = pgTable("api_keys", {
+  id: serial("id").primaryKey(),
   name: text("name").notNull(),
   hash: text("hash").notNull(),
-  oneTimeUse: integer("one_time_use", { mode: "boolean" }).notNull().default(false),
-  used: integer("used", { mode: "boolean" }).notNull().default(false),
-  createdAt: integer("created_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
-  lastUsedAt: integer("last_used_at", { mode: "timestamp" }),
+  oneTimeUse: boolean("one_time_use").notNull().default(false),
+  used: boolean("used").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  lastUsedAt: timestamp("last_used_at"),
 });

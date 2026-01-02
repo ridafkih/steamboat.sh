@@ -13,10 +13,12 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "drizzle-orm": "0.45.1"
+    "drizzle-orm": "0.45.1",
+    "pg": "8.16.3"
   },
   "devDependencies": {
     "@steam-eye/typescript-config": "workspace:*",
+    "@types/pg": "8.16.0",
     "drizzle-kit": "0.31.8",
     "typescript": "5.9.3"
   }
