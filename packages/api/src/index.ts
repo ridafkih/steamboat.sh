@@ -19,10 +19,6 @@ entry("api")
     context.set("port", port);
     context.set("bootstrap.ready", ready);
 
-    if (!ready) {
-      throw new Error("Server is misconfigured");
-    }
-
     Bun.serve({
       port,
       fetch: async (request) => {

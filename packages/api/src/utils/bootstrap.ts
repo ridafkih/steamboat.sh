@@ -1,4 +1,4 @@
-import { count } from "drizzle-orm";
+import { count, eq } from "drizzle-orm";
 import { apiKeys, keyValue } from "@steam-eye/database/schema";
 import type { DatabaseClient } from "@steam-eye/database";
 import { BootstrapError } from "./errors";
@@ -11,8 +11,14 @@ type BootstrapResult = {
   ready: boolean;
 };
 
-const getApiKeyCount = async (database: DatabaseClient): Promise<number> => {
-  const [selection] = await database.select({ count: count() }).from(apiKeys);
+const getPermanentAdministratorKeys = async (
+  database: DatabaseClient,
+): Promise<number> => {
+  const [selection] = await database
+    .select({ count: count() })
+    .from(apiKeys)
+    .where(eq(apiKeys.oneTimeUse, false));
+
   return selection?.count ?? 0;
 };
 
@@ -20,11 +26,11 @@ export const bootstrap = async (
   database: DatabaseClient,
 ): Promise<BootstrapResult> => {
   const firstLaunch = await getValue(database, FIRST_LAUNCH_KEY);
-  const keyCount = await getApiKeyCount(database);
+  const keyCount = await getPermanentAdministratorKeys(database);
 
   if (keyCount > 0 && firstLaunch === "true") {
     throw new BootstrapError(
-      "Administrator keys are configured despite the presence of administrator API keys. This is a critical security misconfiguration.",
+      "Administrator keys are configured despite first launch being flagged to true. This is a critical security misconfiguration.",
     );
   }
 
