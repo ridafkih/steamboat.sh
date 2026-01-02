@@ -19,7 +19,7 @@ export const createGameSchema = type({
 });
 
 export const compareGamesSchema = type({
-  targetUserId: "number",
+  targetUserId: "string",
 });
 
 export const hideGameSchema = type({
@@ -29,7 +29,7 @@ export const hideGameSchema = type({
 });
 
 export const listUserGamesSchema = type({
-  userId: "number",
+  userId: "string",
 });
 
 export type GameId = typeof gameIdSchema.infer;

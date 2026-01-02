@@ -1,6 +1,6 @@
 import { type } from "arktype";
 
-export const adminUserIdSchema = type({ userId: "number" });
+export const adminUserIdSchema = type({ userId: "string" });
 
 export const adminUsersQuerySchema = type({
   "discordId?": "string",
