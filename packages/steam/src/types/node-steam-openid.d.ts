@@ -23,7 +23,7 @@ declare module "node-steam-openid" {
   class SteamAuth {
     constructor(options: SteamAuthOptions);
     getRedirectUrl(): Promise<string>;
-    authenticate(request: { url: string }): Promise<UserObject>;
+    authenticate(request: { method: string; url: string }): Promise<UserObject>;
   }
 
   export default SteamAuth;

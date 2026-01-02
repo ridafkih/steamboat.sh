@@ -5,6 +5,7 @@ import { createRequestLogger } from "@steam-eye/log/request";
 import {
   createSteamAuth,
   linkSteamAccount,
+  syncSteamGames,
   SteamAccountAlreadyLinkedError,
 } from "@steam-eye/steam";
 import { router } from "./routers";
@@ -104,22 +105,57 @@ entry("api")
           const errorRedirectUrl = new URL(env.CORS_ORIGIN);
 
           if (!session?.user) {
+            requestLogger.set("error", {
+              type: "AuthenticationError",
+              message: "No session found during Steam callback",
+            });
+            
             errorRedirectUrl.searchParams.set("error", "unauthorized");
             requestLogger.emit({ statusCode: 302 });
             return Response.redirect(errorRedirectUrl.toString(), 302);
           }
 
+          requestLogger.set("userId", session.user.id);
+
           try {
             const steamUser = await steamAuth.authenticate(request);
-            await linkSteamAccount(database, session.user.id, steamUser);
+            requestLogger.setAll({
+              steamId: steamUser.steamid,
+              steamUsername: steamUser.username,
+            });
+
+            const linkResult = await linkSteamAccount(database, session.user.id, steamUser);
+            requestLogger.set("steamAccountId", linkResult.steamAccountId);
+            requestLogger.set("isNewSteamAccount", linkResult.isNew);
+
+            const syncedGamesCount = await syncSteamGames(
+              database,
+              linkResult.steamAccountId,
+              linkResult.steamId,
+              env.STEAM_API_KEY,
+            );
+            requestLogger.set("syncedGamesCount", syncedGamesCount);
+
             const successRedirectUrl = new URL(env.CORS_ORIGIN);
             successRedirectUrl.searchParams.set("steam", "linked");
             requestLogger.emit({ statusCode: 302 });
             return Response.redirect(successRedirectUrl.toString(), 302);
           } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : String(error);
+            const errorStack = error instanceof Error ? error.stack : undefined;
+
             if (error instanceof SteamAccountAlreadyLinkedError) {
+              requestLogger.set("error", {
+                type: "SteamAccountAlreadyLinkedError",
+                message: errorMessage,
+              });
               errorRedirectUrl.searchParams.set("error", "steam-already-linked");
             } else {
+              requestLogger.set("error", {
+                type: error instanceof Error ? error.constructor.name : "UnknownError",
+                message: errorMessage,
+                stack: errorStack,
+              });
               errorRedirectUrl.searchParams.set("error", "steam-link-failed");
             }
             requestLogger.emit({ statusCode: 302 });

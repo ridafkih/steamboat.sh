@@ -11,6 +11,7 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
+    "@steam-eye/data-schemas": "workspace:*",
     "@steam-eye/database": "workspace:*",
     "drizzle-orm": "0.45.1",
     "node-steam-openid": "^2.0.0"

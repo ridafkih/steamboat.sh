@@ -9,7 +9,7 @@ type SteamAuthOptions = {
 export type SteamUser = {
   steamid: string;
   username: string;
-  name: string | undefined;
+  name: string;
   profile: {
     url: string;
   };
@@ -30,6 +30,21 @@ export const createSteamAuth = (options: SteamAuthOptions): SteamAuthClient => {
 
   return {
     getRedirectUrl: () => steamAuth.getRedirectUrl(),
-    authenticate: (request: Request) => steamAuth.authenticate(request),
+    authenticate: async (request: Request): Promise<SteamUser> => {
+      const result = await steamAuth.authenticate({
+        method: request.method,
+        url: request.url,
+      });
+      const profile = result._json.profileurl;
+      return {
+        steamid: result.steamid,
+        username: result.username,
+        name: result.name,
+        profile: {
+          url: typeof profile === "string" ? profile : "",
+        },
+        avatar: result.avatar,
+      };
+    },
   };
 };

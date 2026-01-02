@@ -10,11 +10,17 @@ export class SteamAccountAlreadyLinkedError extends Error {
   }
 }
 
+type LinkSteamAccountResult = {
+  steamAccountId: number;
+  steamId: string;
+  isNew: boolean;
+};
+
 export const linkSteamAccount = async (
   database: DatabaseClient,
   userId: string,
   steamUser: SteamUser,
-): Promise<void> => {
+): Promise<LinkSteamAccountResult> => {
   const existingAccount = await database.query.steamAccounts.findFirst({
     where: eq(steamAccounts.steamId, steamUser.steamid),
   });
@@ -27,22 +33,37 @@ export const linkSteamAccount = async (
           steamUsername: steamUser.username,
           steamAvatar: steamUser.avatar.large,
           profileUrl: steamUser.profile.url,
-          lastSyncedAt: new Date(),
         })
         .where(eq(steamAccounts.steamId, steamUser.steamid));
-      return;
+      return {
+        steamAccountId: existingAccount.id,
+        steamId: existingAccount.steamId,
+        isNew: false,
+      };
     }
     throw new SteamAccountAlreadyLinkedError();
   }
 
-  await database.insert(steamAccounts).values({
-    userId,
+  const [inserted] = await database
+    .insert(steamAccounts)
+    .values({
+      userId,
+      steamId: steamUser.steamid,
+      steamUsername: steamUser.username,
+      steamAvatar: steamUser.avatar.large,
+      profileUrl: steamUser.profile.url,
+    })
+    .returning({ id: steamAccounts.id });
+
+  if (!inserted) {
+    throw new Error("Failed to insert steam account");
+  }
+
+  return {
+    steamAccountId: inserted.id,
     steamId: steamUser.steamid,
-    steamUsername: steamUser.username,
-    steamAvatar: steamUser.avatar.large,
-    profileUrl: steamUser.profile.url,
-    lastSyncedAt: new Date(),
-  });
+    isNew: true,
+  };
 };
 
 export const getUserSteamAccounts = async (
