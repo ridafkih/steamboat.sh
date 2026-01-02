@@ -15,9 +15,9 @@
     "types": "turbo run types --parallel"
   },
   "devDependencies": {
-    "turbo": "^2.3.0"
+    "turbo": "^2.7.2"
   },
   "peerDependencies": {
-    "typescript": "^5"
+    "typescript": "^5.9.3"
   }
 }

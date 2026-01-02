@@ -4,9 +4,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build && bun build server.ts --outdir dist --target bun --outfile dist/server.js",
     "preview": "vite preview",
-    "start": "vite preview",
+    "start": "bun run dist/server.js",
     "types": "tsc --noEmit"
   },
   "dependencies": {

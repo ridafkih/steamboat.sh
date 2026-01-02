@@ -4,5 +4,8 @@
   "type": "module",
   "exports": {
     ".": "./tsconfig.json"
+  },
+  "dependencies": {
+    "bun-types": "^1.2.17"
   }
 }

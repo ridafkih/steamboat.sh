@@ -1,0 +1,12 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "start": {
+      "passThroughEnv": [
+        "DATABASE_URL",
+        "STEAM_API_KEY"
+      ]
+    }
+  }
+}

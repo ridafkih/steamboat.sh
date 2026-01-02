@@ -1,0 +1,22 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "migrate": {
+      "dependsOn": ["@steamboat/database#migrate"],
+      "cache": false
+    },
+    "start": {
+      "passThroughEnv": [
+        "DATABASE_URL",
+        "CORS_ORIGIN",
+        "BETTER_AUTH_SECRET",
+        "BETTER_AUTH_URL",
+        "DISCORD_CLIENT_ID",
+        "DISCORD_CLIENT_SECRET",
+        "STEAM_API_KEY",
+        "STEAM_REALM"
+      ]
+    }
+  }
+}

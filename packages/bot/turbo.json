@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "start": {
+      "passThroughEnv": [
+        "DISCORD_TOKEN",
+        "API_URL",
+        "API_KEY",
+        "WEB_URL"
+      ]
+    }
+  }
+}
