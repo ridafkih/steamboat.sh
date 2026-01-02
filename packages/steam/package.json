@@ -1,0 +1,22 @@
+{
+  "name": "@steam-eye/steam",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./openid": "./src/openid.ts",
+    "./accounts": "./src/accounts.ts"
+  },
+  "scripts": {
+    "types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@steam-eye/database": "workspace:*",
+    "drizzle-orm": "0.45.1",
+    "node-steam-openid": "^2.0.0"
+  },
+  "devDependencies": {
+    "@steam-eye/typescript-config": "workspace:*",
+    "typescript": "5.9.3"
+  }
+}
