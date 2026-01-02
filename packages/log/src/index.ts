@@ -25,6 +25,7 @@ const DEFAULT_REDACT_PATHS = [
   "env.DISCORD_CLIENT_SECRET",
   "env.BETTER_AUTH_SECRET",
   "env.API_KEY",
+  "env.STEAM_API_KEY",
 ];
 
 export const log = pino({
