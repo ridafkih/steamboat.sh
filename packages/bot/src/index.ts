@@ -1,43 +1,15 @@
-import {
-  Client,
-  Events,
-  GatewayIntentBits,
-  SlashCommandBuilder,
-  REST,
-  Routes,
-  type ChatInputCommandInteraction,
-} from "discord.js";
+import { join } from "node:path";
+import { Client, Events, GatewayIntentBits } from "discord.js";
 import { createClient } from "@steamboat/api/client";
 import { entry } from "@steamboat/entry-point";
-import {
-  createInteractionLogger,
-  type InteractionLogger,
-} from "@steamboat/log";
+import { getAllSubcommands } from "./utils/get-commands";
+import { getAllEvents } from "./utils/get-events";
+import { registerCommands } from "./utils/register-commands";
+import { registerEvents } from "./utils/register-events";
 
-const steamboatCommand = new SlashCommandBuilder()
-  .setName("steamboat")
-  .setDescription("Steamboat commands")
-  .addSubcommand((subcommand) =>
-    subcommand
-      .setName("compare")
-      .setDescription("Compare your Steam library with another user")
-      .addUserOption((option) =>
-        option
-          .setName("user")
-          .setDescription("The user to compare your library with")
-          .setRequired(true),
-      ),
-  )
-  .addSubcommand((subcommand) =>
-    subcommand
-      .setName("profile")
-      .setDescription("Get a link to your or another user's Steam profile")
-      .addUserOption((option) =>
-        option
-          .setName("user")
-          .setDescription("The user whose Steam profile to show (defaults to yourself)"),
-      ),
-  );
+const sourceDirectory = import.meta.dir;
+const commandsDirectory = join(sourceDirectory, "commands");
+const eventsDirectory = join(sourceDirectory, "events");
 
 entry("bot")
   .env({
@@ -56,6 +28,20 @@ entry("bot")
     return { discordToken: env.DISCORD_TOKEN, api, webUrl: env.WEB_URL };
   })
   .run(async ({ discordToken, api, webUrl, log, context }) => {
+    const subcommands = await getAllSubcommands(commandsDirectory, {
+      api,
+      webUrl,
+    });
+
+    const subcommandsMap = new Map(
+      subcommands.map((subcommand) => [subcommand.name, subcommand]),
+    );
+
+    const events = await getAllEvents(eventsDirectory, {
+      subcommands: subcommandsMap,
+      log,
+    });
+
     const client = new Client({
       intents: [GatewayIntentBits.Guilds],
     });
@@ -69,220 +55,6 @@ entry("bot")
     context.set("discord.id", readyClient.user.id);
     context.set("discord.guildCount", readyClient.guilds.cache.size);
 
-    const rest = new REST().setToken(discordToken);
-    await rest.put(Routes.applicationCommands(readyClient.user.id), {
-      body: [steamboatCommand.toJSON()],
-    });
-
-    const handleCompareCommand = async (
-      interaction: ChatInputCommandInteraction,
-      interactionLogger: InteractionLogger,
-    ) => {
-      const targetUser = interaction.options.getUser("user", true);
-      const invokerId = interaction.user.id;
-
-      interactionLogger.setAll({
-        targetUserId: targetUser.id,
-        targetUserTag: targetUser.tag,
-      });
-
-      if (targetUser.id === invokerId) {
-        interactionLogger.setAll({
-          outcome: "user_error",
-          responseType: "self_compare",
-        });
-        await interaction.reply({
-          content: "You can't compare your library with yourself!",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      if (targetUser.bot) {
-        interactionLogger.setAll({
-          outcome: "user_error",
-          responseType: "bot_compare",
-        });
-        await interaction.reply({
-          content: "You can't compare your library with a bot!",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      await interaction.deferReply({ ephemeral: true });
-
-      const [invokerStatus, targetStatus] = await Promise.all([
-        api.library.checkDiscordLinkStatus({ discordId: invokerId }),
-        api.library.checkDiscordLinkStatus({ discordId: targetUser.id }),
-      ]);
-
-      interactionLogger.setAll({
-        invokerHasAccount: invokerStatus.hasAccount,
-        invokerHasSteamLinked: invokerStatus.hasSteamLinked,
-        targetHasAccount: targetStatus.hasAccount,
-        targetHasSteamLinked: targetStatus.hasSteamLinked,
-      });
-
-      if (!invokerStatus.hasAccount || !invokerStatus.hasSteamLinked) {
-        interactionLogger.setAll({
-          outcome: "user_error",
-          responseType: "invoker_not_linked",
-        });
-        const loginUrl = new URL("/login", webUrl);
-        await interaction.editReply({
-          content: `You need to link your Steam account first!\n${loginUrl}`,
-        });
-        return;
-      }
-
-      if (!targetStatus.hasAccount || !targetStatus.hasSteamLinked) {
-        interactionLogger.setAll({
-          outcome: "user_error",
-          responseType: "target_not_linked",
-        });
-        await interaction.editReply({
-          content: `<@${targetUser.id}> hasn't linked their Steam account to Steamboat yet. Ask them to sign up!`,
-        });
-        return;
-      }
-
-      const comparison = await api.admin.discord.compareUsers({
-        invokerDiscordId: invokerId,
-        targetDiscordId: targetUser.id,
-      });
-
-      if (!comparison.found) {
-        interactionLogger.setAll({
-          outcome: "error",
-          responseType: "comparison_failed",
-        });
-        await interaction.editReply({
-          content:
-            "Something went wrong while comparing libraries. Please try again.",
-        });
-        return;
-      }
-
-      interactionLogger.setAll({
-        outcome: "success",
-        responseType: "compare_link",
-        sharedCount: comparison.sharedCount,
-        invokerGameCount: comparison.invokerGameCount,
-        targetGameCount: comparison.targetGameCount,
-      });
-
-      const compareUrl = new URL(`/compare/${targetUser.id}`, webUrl);
-      await interaction.editReply({
-        content: `You share **${comparison.sharedCount}** games with <@${targetUser.id}>!\n${compareUrl}`,
-      });
-    };
-
-    const handleProfileCommand = async (
-      interaction: ChatInputCommandInteraction,
-      interactionLogger: InteractionLogger,
-    ) => {
-      const targetUser = interaction.options.getUser("user") ?? interaction.user;
-      const isSelf = targetUser.id === interaction.user.id;
-
-      interactionLogger.setAll({
-        targetUserId: targetUser.id,
-        targetUserTag: targetUser.tag,
-        isSelf,
-      });
-
-      if (targetUser.bot) {
-        interactionLogger.setAll({
-          outcome: "user_error",
-          responseType: "bot_profile",
-        });
-        await interaction.reply({
-          content: "Bots don't have Steam profiles!",
-          ephemeral: true,
-        });
-        return;
-      }
-
-      await interaction.deferReply({ ephemeral: true });
-
-      const profile = await api.admin.discord.getSteamProfile({
-        discordId: targetUser.id,
-      });
-
-      if (!profile.found) {
-        interactionLogger.setAll({
-          outcome: "user_error",
-          responseType: "no_steam_linked",
-        });
-        if (isSelf) {
-          const loginUrl = new URL("/login", webUrl);
-          await interaction.editReply({
-            content: `You haven't linked your Steam account yet!\n${loginUrl}`,
-          });
-        } else {
-          await interaction.editReply({
-            content: `<@${targetUser.id}> hasn't linked their Steam account to Steamboat yet.`,
-          });
-        }
-        return;
-      }
-
-      interactionLogger.setAll({
-        outcome: "success",
-        responseType: "profile_link",
-        steamId: profile.steamId,
-      });
-
-      const profileUrl = `https://steamcommunity.com/profiles/${profile.steamId}`;
-      await interaction.editReply({
-        content: isSelf
-          ? `Your Steam profile: ${profileUrl}`
-          : `<@${targetUser.id}>'s Steam profile: ${profileUrl}`,
-      });
-    };
-
-    client.on(Events.InteractionCreate, async (interaction) => {
-      if (!interaction.isChatInputCommand()) return;
-
-      const interactionLogger = createInteractionLogger(log, {
-        interactionId: interaction.id,
-        commandName: interaction.commandName,
-        subcommand: interaction.options.getSubcommand(false) ?? undefined,
-        guildId: interaction.guildId ?? undefined,
-        channelId: interaction.channelId,
-        invokerId: interaction.user.id,
-        invokerTag: interaction.user.tag,
-      });
-
-      if (interaction.commandName !== "steamboat") return;
-
-      const subcommand = interaction.options.getSubcommand();
-
-      try {
-        if (subcommand === "compare") {
-          await handleCompareCommand(interaction, interactionLogger);
-        } else if (subcommand === "profile") {
-          await handleProfileCommand(interaction, interactionLogger);
-        }
-      } catch (error) {
-        interactionLogger.setAll({
-          outcome: "error",
-          error: {
-            type: error instanceof Error ? error.name : "UnknownError",
-            message: error instanceof Error ? error.message : String(error),
-            stack: error instanceof Error ? error.stack : undefined,
-          },
-        });
-
-        const errorMessage = "Something went wrong. Please try again later.";
-
-        if (interaction.deferred) {
-          await interaction.editReply({ content: errorMessage });
-        } else {
-          await interaction.reply({ content: errorMessage, ephemeral: true });
-        }
-      } finally {
-        interactionLogger.emit();
-      }
-    });
+    await registerCommands(subcommands, discordToken, readyClient.user.id);
+    registerEvents(events, client);
   });
