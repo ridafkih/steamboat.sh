@@ -1,9 +1,12 @@
 FROM oven/bun:1 AS base
 WORKDIR /app
 
+FROM base AS source
+COPY . .
+
 FROM base AS prune
 RUN bun install --global turbo
-COPY . .
+COPY --from=source /app .
 RUN turbo prune @steamboat/api --docker
 
 FROM base AS build
@@ -16,11 +19,11 @@ FROM base AS runtime
 COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile --production
 COPY --from=build /app/packages/api/dist ./packages/api/dist
-COPY --from=prune /app/out/full/packages/database/src ./packages/database/src
-COPY --from=prune /app/out/full/packages/database/drizzle.config.ts ./packages/database/
-COPY --from=prune /app/packages/database/drizzle ./packages/database/drizzle
+COPY --from=build /app/packages/database/src ./packages/database/src
+COPY --from=build /app/packages/database/drizzle.config.ts ./packages/database/
+COPY --from=source /app/packages/database/drizzle ./packages/database/drizzle
 
 ENV NODE_ENV=production
 EXPOSE 3001
 
-CMD ["sh", "-c", "bunx drizzle-kit migrate --config packages/database/drizzle.config.ts && bun packages/api/dist/index.js"]
+CMD ["sh", "-c", "cd packages/database && bunx drizzle-kit migrate && cd /app && bun packages/api/dist/index.js"]
