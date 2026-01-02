@@ -15,8 +15,10 @@ RUN bun run --cwd packages/web build
 FROM base AS runtime
 COPY --from=build /app/packages/web/dist ./packages/web/dist
 COPY --from=build /app/packages/web/server.ts ./packages/web/server.ts
+COPY --from=build /app/packages/web/entrypoint.sh ./packages/web/entrypoint.sh
+RUN chmod +x ./packages/web/entrypoint.sh
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["bun", "packages/web/server.ts"]
+ENTRYPOINT ["./packages/web/entrypoint.sh"]
