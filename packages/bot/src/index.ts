@@ -33,6 +33,12 @@ entry("bot")
       webUrl,
     });
 
+    context.set("subcommandCount", subcommands.length);
+    context.set(
+      "subcommandNames",
+      subcommands.map((subcommand) => subcommand.name),
+    );
+
     const subcommandsMap = new Map(
       subcommands.map((subcommand) => [subcommand.name, subcommand]),
     );
@@ -41,6 +47,12 @@ entry("bot")
       subcommands: subcommandsMap,
       log,
     });
+
+    context.set("eventCount", events.length);
+    context.set(
+      "eventNames",
+      events.map((event) => event.name),
+    );
 
     const client = new Client({
       intents: [GatewayIntentBits.Guilds],
