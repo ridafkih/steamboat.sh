@@ -16,7 +16,7 @@ FROM base AS runtime
 COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile --production
 COPY --from=build /app/packages/api/dist ./packages/api/dist
-COPY --from=build /app/packages/database ./packages/database
+COPY --from=prune /app/out/full/packages/database ./packages/database
 
 ENV NODE_ENV=production
 EXPOSE 3001
