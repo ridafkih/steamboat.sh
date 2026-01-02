@@ -1,25 +1,21 @@
-FROM oven/bun:1 AS foundation
+FROM oven/bun:1 AS base
 WORKDIR /app
 
-FROM foundation AS prepare
+FROM base AS prune
 RUN bun install --global turbo
 COPY . .
 RUN turbo prune @steamboat/web --docker
 
-FROM foundation AS build
-RUN bun install --global turbo
-
-COPY --from=prepare /app/out/json/ .
+FROM base AS build
+COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile
+COPY --from=prune /app/out/full/ .
+RUN bun run --cwd packages/web build
 
-COPY --from=prepare /app/out/full/ .
-RUN turbo build --filter=@steamboat/web
-
-FROM foundation AS runtime
-
+FROM base AS runtime
 COPY --from=build /app/packages/web/dist ./dist
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["bun", "run", "dist/server.js"]
+CMD ["bun", "dist/server.js"]

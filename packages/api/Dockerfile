@@ -1,32 +1,24 @@
-FROM oven/bun:1 AS foundation
+FROM oven/bun:1 AS base
 WORKDIR /app
 
-FROM foundation AS prepare
+FROM base AS prune
 RUN bun install --global turbo
 COPY . .
 RUN turbo prune @steamboat/api --docker
 
-FROM foundation AS build
-COPY --from=prepare /app/out/json/ .
+FROM base AS build
+COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile
+COPY --from=prune /app/out/full/ .
+RUN bun build packages/api/src/index.ts --outdir packages/api/dist --target bun
 
-COPY --from=prepare /app/out/full/ .
-RUN bun run build --filter=@steamboat/api
-
-FROM foundation AS runtime
-RUN bun install --global turbo
-
-COPY --from=prepare /app/out/json/ .
+FROM base AS runtime
+COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile --production
-
-COPY --from=build /app/turbo.json ./turbo.json
-COPY --from=build /app/packages/api/turbo.json ./packages/api/turbo.json
 COPY --from=build /app/packages/api/dist ./packages/api/dist
-COPY --from=build /app/packages/api/package.json ./packages/api/package.json
 COPY --from=build /app/packages/database ./packages/database
 
 ENV NODE_ENV=production
-ENV TURBO_TELEMETRY_DISABLED=1
 EXPOSE 3001
 
-CMD ["turbo", "migrate", "start"]
+CMD ["sh", "-c", "bunx drizzle-kit migrate --config packages/database/drizzle.config.ts && bun packages/api/dist/index.js"]
