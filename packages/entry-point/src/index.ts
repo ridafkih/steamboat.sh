@@ -1,5 +1,5 @@
 import arkenv, { createEnv, type } from "arkenv";
-import { log, type Logger } from "@steam-eye/log";
+import { log, type Logger } from "@steamboat/log";
 
 type ArkEnvSchemaDefinition = Parameters<typeof createEnv>[0];
 

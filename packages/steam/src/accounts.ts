@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { steamAccounts } from "@steam-eye/database/schema";
-import type { DatabaseClient } from "@steam-eye/database";
+import { steamAccounts } from "@steamboat/database/schema";
+import type { DatabaseClient } from "@steamboat/database";
 import type { SteamUser } from "./openid";
 
 export class SteamAccountAlreadyLinkedError extends Error {

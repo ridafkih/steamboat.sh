@@ -1,18 +1,25 @@
 import { eq, and, inArray } from "drizzle-orm";
-import { accounts, ownedGames, steamAccounts, users } from "@steam-eye/database/schema";
+import {
+  accounts,
+  ownedGames,
+  steamAccounts,
+  users,
+} from "@steamboat/database/schema";
 import {
   compareGamesSchema,
   compareByDiscordIdSchema,
   hideGameSchema,
   listUserGamesSchema,
   checkDiscordLinkStatusSchema,
-} from "@steam-eye/data-schemas";
+} from "@steamboat/data-schemas";
 import { publicProcedure, authedProcedure } from "../orpc";
 
 export const listMyGames = authedProcedure.handler(async ({ context }) => {
-  const userSteamAccounts = await context.database.query.steamAccounts.findMany({
-    where: eq(steamAccounts.userId, context.userId),
-  });
+  const userSteamAccounts = await context.database.query.steamAccounts.findMany(
+    {
+      where: eq(steamAccounts.userId, context.userId),
+    },
+  );
 
   const accountIds = userSteamAccounts.map((account) => account.id);
 
@@ -23,7 +30,7 @@ export const listMyGames = authedProcedure.handler(async ({ context }) => {
   const games = await context.database.query.ownedGames.findMany({
     where: and(
       inArray(ownedGames.steamAccountId, accountIds),
-      eq(ownedGames.hidden, false)
+      eq(ownedGames.hidden, false),
     ),
     with: { game: true },
   });
@@ -42,9 +49,10 @@ export const listUserGames = publicProcedure
       return [];
     }
 
-    const userSteamAccounts = await context.database.query.steamAccounts.findMany({
-      where: eq(steamAccounts.userId, input.userId),
-    });
+    const userSteamAccounts =
+      await context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, input.userId),
+      });
 
     const accountIds = userSteamAccounts.map((account) => account.id);
 
@@ -55,7 +63,7 @@ export const listUserGames = publicProcedure
     const games = await context.database.query.ownedGames.findMany({
       where: and(
         inArray(ownedGames.steamAccountId, accountIds),
-        eq(ownedGames.hidden, false)
+        eq(ownedGames.hidden, false),
       ),
       with: { game: true },
     });
@@ -66,13 +74,15 @@ export const listUserGames = publicProcedure
 export const compareGames = authedProcedure
   .input(compareGamesSchema)
   .handler(async ({ input, context }) => {
-    const currentUserAccounts = await context.database.query.steamAccounts.findMany({
-      where: eq(steamAccounts.userId, context.userId),
-    });
+    const currentUserAccounts =
+      await context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, context.userId),
+      });
 
-    const targetUserAccounts = await context.database.query.steamAccounts.findMany({
-      where: eq(steamAccounts.userId, input.targetUserId),
-    });
+    const targetUserAccounts =
+      await context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, input.targetUserId),
+      });
 
     const currentAccountIds = currentUserAccounts.map((account) => account.id);
     const targetAccountIds = targetUserAccounts.map((account) => account.id);
@@ -84,7 +94,7 @@ export const compareGames = authedProcedure
     const currentUserGames = await context.database.query.ownedGames.findMany({
       where: and(
         inArray(ownedGames.steamAccountId, currentAccountIds),
-        eq(ownedGames.hidden, false)
+        eq(ownedGames.hidden, false),
       ),
       with: { game: true },
     });
@@ -92,7 +102,7 @@ export const compareGames = authedProcedure
     const targetUserGames = await context.database.query.ownedGames.findMany({
       where: and(
         inArray(ownedGames.steamAccountId, targetAccountIds),
-        eq(ownedGames.hidden, false)
+        eq(ownedGames.hidden, false),
       ),
       with: { game: true },
     });
@@ -100,9 +110,15 @@ export const compareGames = authedProcedure
     const currentUserAppIds = new Set(currentUserGames.map((g) => g.appId));
     const targetUserAppIds = new Set(targetUserGames.map((g) => g.appId));
 
-    const shared = currentUserGames.filter((g) => targetUserAppIds.has(g.appId));
-    const onlyCurrentUser = currentUserGames.filter((g) => !targetUserAppIds.has(g.appId));
-    const onlyTargetUser = targetUserGames.filter((g) => !currentUserAppIds.has(g.appId));
+    const shared = currentUserGames.filter((g) =>
+      targetUserAppIds.has(g.appId),
+    );
+    const onlyCurrentUser = currentUserGames.filter(
+      (g) => !targetUserAppIds.has(g.appId),
+    );
+    const onlyTargetUser = targetUserGames.filter(
+      (g) => !currentUserAppIds.has(g.appId),
+    );
 
     return { shared, onlyCurrentUser, onlyTargetUser };
   });
@@ -125,13 +141,15 @@ export const compareByDiscordId = authedProcedure
       return { isSelf: true as const };
     }
 
-    const currentUserAccounts = await context.database.query.steamAccounts.findMany({
-      where: eq(steamAccounts.userId, context.userId),
-    });
+    const currentUserAccounts =
+      await context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, context.userId),
+      });
 
-    const targetUserAccounts = await context.database.query.steamAccounts.findMany({
-      where: eq(steamAccounts.userId, targetAccount.userId),
-    });
+    const targetUserAccounts =
+      await context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, targetAccount.userId),
+      });
 
     if (currentUserAccounts.length === 0 || targetUserAccounts.length === 0) {
       return { found: false as const };
@@ -187,8 +205,8 @@ export const setGameVisibility = authedProcedure
       .where(
         and(
           eq(ownedGames.steamAccountId, input.steamAccountId),
-          eq(ownedGames.appId, input.appId)
-        )
+          eq(ownedGames.appId, input.appId),
+        ),
       );
 
     return { success: true };
@@ -208,9 +226,10 @@ export const checkDiscordLinkStatus = publicProcedure
       return { hasAccount: false, hasSteamLinked: false };
     }
 
-    const userSteamAccounts = await context.database.query.steamAccounts.findMany({
-      where: eq(steamAccounts.userId, discordAccount.userId),
-    });
+    const userSteamAccounts =
+      await context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, discordAccount.userId),
+      });
 
     return {
       hasAccount: true,

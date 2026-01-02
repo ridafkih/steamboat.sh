@@ -1,9 +1,9 @@
-name: steam-eye
+name: steamboat
 
 services:
   postgres:
     image: postgres:17
-    container_name: steam-eye-postgres
+    container_name: steamboat-postgres
     environment:
       POSTGRES_USER: ${DATABASE_USER}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
@@ -11,8 +11,8 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - steam-eye-postgres-data:/var/lib/postgresql/data
+      - steamboat-postgres-data:/var/lib/postgresql/data
     restart: unless-stopped
 
 volumes:
-  steam-eye-postgres-data:
+  steamboat-postgres-data:

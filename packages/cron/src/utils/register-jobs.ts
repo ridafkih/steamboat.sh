@@ -1,5 +1,5 @@
 import type { CronOptions, ICron } from "cronbake";
-import type { Logger } from "@steam-eye/log";
+import type { Logger } from "@steamboat/log";
 import { baker } from "./baker";
 
 export const registerJobs = (jobs: CronOptions[], log: Logger): ICron[] => {

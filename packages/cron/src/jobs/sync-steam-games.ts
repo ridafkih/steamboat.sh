@@ -1,5 +1,5 @@
-import { steamAccounts } from "@steam-eye/database/schema";
-import { syncSteamGames } from "@steam-eye/steam";
+import { steamAccounts } from "@steamboat/database/schema";
+import { syncSteamGames } from "@steamboat/steam";
 import type { CronContext, CronJobDefinition } from "../types";
 
 export default ({ database, env }: CronContext): CronJobDefinition => ({

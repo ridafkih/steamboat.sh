@@ -1,6 +1,6 @@
 import { join } from "node:path";
-import { createDatabase } from "@steam-eye/database";
-import { entry } from "@steam-eye/entry-point";
+import { createDatabase } from "@steamboat/database";
+import { entry } from "@steamboat/entry-point";
 import { getAllJobs } from "./utils/get-jobs";
 import { injectJobs } from "./utils/inject-jobs";
 import { registerJobs } from "./utils/register-jobs";
@@ -22,5 +22,8 @@ entry("cron")
     const registeredJobs = registerJobs(injectedJobs, log);
 
     context.set("jobCount", registeredJobs.length);
-    context.set("jobNames", jobs.map((job) => job.name));
+    context.set(
+      "jobNames",
+      jobs.map((job) => job.name),
+    );
   });

@@ -1,4 +1,4 @@
-# steam-eye
+# steamboat
 
 To install dependencies:
 

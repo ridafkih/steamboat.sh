@@ -1,13 +1,15 @@
 import { eq } from "drizzle-orm";
-import { steamAccounts } from "@steam-eye/database/schema";
-import { unlinkSteamAccountSchema } from "@steam-eye/data-schemas";
+import { steamAccounts } from "@steamboat/database/schema";
+import { unlinkSteamAccountSchema } from "@steamboat/data-schemas";
 import { authedProcedure } from "../orpc";
 
-export const getLinkedAccounts = authedProcedure.handler(async ({ context }) => {
-  return await context.database.query.steamAccounts.findMany({
-    where: eq(steamAccounts.userId, context.userId),
-  });
-});
+export const getLinkedAccounts = authedProcedure.handler(
+  async ({ context }) => {
+    return await context.database.query.steamAccounts.findMany({
+      where: eq(steamAccounts.userId, context.userId),
+    });
+  },
+);
 
 export const unlinkAccount = authedProcedure
   .input(unlinkSteamAccountSchema)

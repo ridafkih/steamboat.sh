@@ -1,6 +1,6 @@
 import { count, eq } from "drizzle-orm";
-import { apiKeys, keyValue } from "@steam-eye/database/schema";
-import type { DatabaseClient } from "@steam-eye/database";
+import { apiKeys, keyValue } from "@steamboat/database/schema";
+import type { DatabaseClient } from "@steamboat/database";
 import { BootstrapError } from "./errors";
 import { getValue } from "./key-value";
 import { generateSecureApiKey } from "./crypto";

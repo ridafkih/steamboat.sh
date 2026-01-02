@@ -4,11 +4,11 @@ import {
   discordServerMembers,
   steamAccounts,
   ownedGames,
-} from "@steam-eye/database/schema";
+} from "@steamboat/database/schema";
 import {
   adminServerIdSchema,
   adminCompareDiscordUsersSchema,
-} from "@steam-eye/data-schemas";
+} from "@steamboat/data-schemas";
 import { adminProcedure } from "../../orpc";
 
 export const getServerUsers = adminProcedure
@@ -54,7 +54,7 @@ export const getServerGames = adminProcedure
       with: { game: true },
     });
 
-    const uniqueGames = new Map<number, typeof serverGames[number]["game"]>();
+    const uniqueGames = new Map<number, (typeof serverGames)[number]["game"]>();
     for (const owned of serverGames) {
       if (owned.game && !uniqueGames.has(owned.appId)) {
         uniqueGames.set(owned.appId, owned.game);

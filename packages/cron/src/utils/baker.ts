@@ -1,5 +1,5 @@
 import { Baker } from "cronbake";
-import { log } from "@steam-eye/log";
+import { log } from "@steamboat/log";
 
 export const baker = Baker.create({
   onError(error, jobName) {

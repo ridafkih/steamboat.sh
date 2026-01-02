@@ -1,5 +1,5 @@
 {
-  "name": "@steam-eye/bot",
+  "name": "@steamboat/bot",
   "private": true,
   "type": "module",
   "scripts": {
@@ -9,14 +9,14 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "@steam-eye/api": "workspace:*",
-    "@steam-eye/entry-point": "workspace:*",
-    "@steam-eye/log": "workspace:*",
+    "@steamboat/api": "workspace:*",
+    "@steamboat/entry-point": "workspace:*",
+    "@steamboat/log": "workspace:*",
     "arkenv": "0.8.1",
     "discord.js": "^14.16.0"
   },
   "devDependencies": {
-    "@steam-eye/typescript-config": "workspace:*",
+    "@steamboat/typescript-config": "workspace:*",
     "pino-pretty": "13.1.3",
     "typescript": "5.9.3"
   }

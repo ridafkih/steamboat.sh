@@ -1,6 +1,6 @@
 import type { CronOptions } from "cronbake";
-import type { DatabaseClient } from "@steam-eye/database";
-import type { Logger } from "@steam-eye/log";
+import type { DatabaseClient } from "@steamboat/database";
+import type { Logger } from "@steamboat/log";
 
 export type CronEnv = {
   DATABASE_URL: string;

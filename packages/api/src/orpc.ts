@@ -1,6 +1,6 @@
 import { os, ORPCError } from "@orpc/server";
-import type { DatabaseClient } from "@steam-eye/database";
-import type { RequestLogger } from "@steam-eye/log/request";
+import type { DatabaseClient } from "@steamboat/database";
+import type { RequestLogger } from "@steamboat/log/request";
 import { verifyApiKey, markApiKeyUsed } from "./utils/api-key";
 
 export type Context = {

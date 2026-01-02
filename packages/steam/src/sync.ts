@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm";
-import { games, ownedGames, steamAccounts } from "@steam-eye/database/schema";
-import type { DatabaseClient } from "@steam-eye/database";
-import { steamOwnedGamesResponseSchema } from "@steam-eye/data-schemas";
+import { games, ownedGames, steamAccounts } from "@steamboat/database/schema";
+import type { DatabaseClient } from "@steamboat/database";
+import { steamOwnedGamesResponseSchema } from "@steamboat/data-schemas";
 
 const buildSteamIconUrl = (appId: number, iconHash: string) =>
   `https://media.steampowered.com/steamcommunity/public/images/apps/${appId}/${iconHash}.jpg`;

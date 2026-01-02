@@ -7,9 +7,12 @@ import {
   Routes,
   type ChatInputCommandInteraction,
 } from "discord.js";
-import { createClient } from "@steam-eye/api/client";
-import { entry } from "@steam-eye/entry-point";
-import { createInteractionLogger, type InteractionLogger } from "@steam-eye/log";
+import { createClient } from "@steamboat/api/client";
+import { entry } from "@steamboat/entry-point";
+import {
+  createInteractionLogger,
+  type InteractionLogger,
+} from "@steamboat/log";
 
 const compareCommand = new SlashCommandBuilder()
   .setName("steamboat")
@@ -144,7 +147,8 @@ entry("bot")
           responseType: "comparison_failed",
         });
         await interaction.editReply({
-          content: "Something went wrong while comparing libraries. Please try again.",
+          content:
+            "Something went wrong while comparing libraries. Please try again.",
         });
         return;
       }

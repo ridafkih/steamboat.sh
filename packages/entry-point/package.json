@@ -1,5 +1,5 @@
 {
-  "name": "@steam-eye/entry-point",
+  "name": "@steamboat/entry-point",
   "private": true,
   "type": "module",
   "exports": {
@@ -9,11 +9,11 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "@steam-eye/log": "workspace:*",
+    "@steamboat/log": "workspace:*",
     "arkenv": "0.8.1"
   },
   "devDependencies": {
-    "@steam-eye/typescript-config": "workspace:*",
+    "@steamboat/typescript-config": "workspace:*",
     "typescript": "5.9.3"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@steam-eye/log",
+  "name": "@steamboat/log",
   "private": true,
   "type": "module",
   "exports": {
@@ -13,7 +13,7 @@
     "pino": "10.1.0"
   },
   "devDependencies": {
-    "@steam-eye/typescript-config": "workspace:*",
+    "@steamboat/typescript-config": "workspace:*",
     "pino-pretty": "13.1.3",
     "typescript": "5.9.3"
   }

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { games, ownedGames } from "@steam-eye/database/schema";
-import { adminGameIdSchema } from "@steam-eye/data-schemas";
+import { games, ownedGames } from "@steamboat/database/schema";
+import { adminGameIdSchema } from "@steamboat/data-schemas";
 import { adminProcedure } from "../../orpc";
 
 export const listGames = adminProcedure.handler(async ({ context }) => {

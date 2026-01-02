@@ -1,7 +1,11 @@
 {
-  "extends": "@steam-eye/typescript-config",
+  "extends": "@steamboat/typescript-config",
   "compilerOptions": {
-    "typeRoots": ["./src/types", "../../node_modules/@types", "../../node_modules"]
+    "typeRoots": [
+      "./src/types",
+      "../../node_modules/@types",
+      "../../node_modules",
+    ],
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
 }

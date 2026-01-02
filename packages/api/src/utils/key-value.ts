@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { keyValue } from "@steam-eye/database/schema";
-import type { DatabaseClient } from "@steam-eye/database";
+import { keyValue } from "@steamboat/database/schema";
+import type { DatabaseClient } from "@steamboat/database";
 
 export const getValue = async (
   database: DatabaseClient,

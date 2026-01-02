@@ -1,7 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import type { DatabaseClient } from "@steam-eye/database";
-import * as schema from "@steam-eye/database/schema";
+import type { DatabaseClient } from "@steamboat/database";
+import * as schema from "@steamboat/database/schema";
 
 type CreateAuthOptions = {
   trustedOrigins: string[];

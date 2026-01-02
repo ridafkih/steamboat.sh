@@ -1,5 +1,5 @@
 {
-  "name": "@steam-eye/typescript-config",
+  "name": "@steamboat/typescript-config",
   "private": true,
   "type": "module",
   "exports": {

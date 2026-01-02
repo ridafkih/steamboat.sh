@@ -1,6 +1,9 @@
 import { eq, and } from "drizzle-orm";
-import { users, steamAccounts, accounts } from "@steam-eye/database/schema";
-import { adminUserIdSchema, adminUsersQuerySchema } from "@steam-eye/data-schemas";
+import { users, steamAccounts, accounts } from "@steamboat/database/schema";
+import {
+  adminUserIdSchema,
+  adminUsersQuerySchema,
+} from "@steamboat/data-schemas";
 import { adminProcedure } from "../../orpc";
 
 export const listUsers = adminProcedure.handler(async ({ context }) => {
@@ -28,10 +31,12 @@ export const searchUsers = adminProcedure
     }
 
     if (input.steamId) {
-      const steamAccount = await context.database.query.steamAccounts.findFirst({
-        where: eq(steamAccounts.steamId, input.steamId),
-        with: { user: { with: { steamAccounts: true, accounts: true } } },
-      });
+      const steamAccount = await context.database.query.steamAccounts.findFirst(
+        {
+          where: eq(steamAccounts.steamId, input.steamId),
+          with: { user: { with: { steamAccounts: true, accounts: true } } },
+        },
+      );
       return steamAccount?.user ? [steamAccount.user] : [];
     }
 
@@ -39,7 +44,7 @@ export const searchUsers = adminProcedure
       const discordAccount = await context.database.query.accounts.findFirst({
         where: and(
           eq(accounts.providerId, "discord"),
-          eq(accounts.accountId, input.discordId)
+          eq(accounts.accountId, input.discordId),
         ),
         with: { user: { with: { steamAccounts: true, accounts: true } } },
       });

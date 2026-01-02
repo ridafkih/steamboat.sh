@@ -1,4 +1,4 @@
-import { createClient } from "@steam-eye/api/client";
+import { createClient } from "@steamboat/api/client";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 

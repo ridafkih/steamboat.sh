@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
-import { apiKeys } from "@steam-eye/database/schema";
-import type { DatabaseClient } from "@steam-eye/database";
+import { apiKeys } from "@steamboat/database/schema";
+import type { DatabaseClient } from "@steamboat/database";
 
 type ApiKey = typeof apiKeys.$inferSelect;
 

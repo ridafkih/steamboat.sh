@@ -1,5 +1,5 @@
 import type { CronOptions } from "cronbake";
-import type { Logger } from "@steam-eye/log";
+import type { Logger } from "@steamboat/log";
 import type { CronJobDefinition, JobContext } from "../types";
 
 export const injectJobs = (
