@@ -13,9 +13,11 @@ Default to using Bun instead of Node.js.
 - Use `bun run <script>` instead of `npm run <script>` or `yarn run <script>` or `pnpm run <script>`
 - Use `bunx <package> <command>` instead of `npx <package> <command>`
 - Bun automatically loads .env, so don't use dotenv.
+- Always construct URLs using `new URL`, rather than concatenating.
 
 ## Code Style
 
+- **Arrow functions only.** Use `const fn = () => {}` not `function fn() {}`.
 - **No abbreviated variable names.** Use full, self-descriptive names.
   - `database` not `db`
   - `requestLogger` not `reqLog`
@@ -28,6 +30,7 @@ Default to using Bun instead of Node.js.
 - **No type assertions.** Avoid `as Type` or non-null assertions `!`. Fix the types properly instead.
 - **Self-descriptive code.** Names should make the code readable without comments.
 - **No unnecessary comments.** Code should be self-explanatory.
+- **No declaration-and-returns.** Rather than `const N = await ...\nreturn N` prefer `return await ...`.
 
 ## Project Structure
 

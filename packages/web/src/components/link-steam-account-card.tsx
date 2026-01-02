@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Gamepad, Lock } from "lucide-react";
+import { Gamepad, Lock, Loader2 } from "lucide-react";
 import SteamIcon from "@/assets/steam.svg?react";
 import {
   Card,
@@ -21,8 +21,10 @@ export const LinkSteamAccountCard = () => {
   const [unlinkingAccountId, setUnlinkingAccountId] = useState<number | null>(
     null,
   );
+  const [isLinking, setIsLinking] = useState(false);
 
   const handleLinkSteam = () => {
+    setIsLinking(true);
     const linkUrl = new URL("/api/steam/link", apiBaseUrl);
     window.location.href = linkUrl.toString();
   };
@@ -149,8 +151,8 @@ export const LinkSteamAccountCard = () => {
       </CardContent>
 
       <CardFooter className="flex flex-col gap-2">
-        <Button className="w-full" onClick={handleLinkSteam}>
-          Authenticate
+        <Button className="w-full" onClick={handleLinkSteam} disabled={isLinking}>
+          {isLinking ? <Loader2 className="size-5 animate-spin" /> : "Authenticate"}
         </Button>
         <p className="text-xs text-muted-foreground text-center">
           By selecting "Authenticate" you agree to our{" "}
