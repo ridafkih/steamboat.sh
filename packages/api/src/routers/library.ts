@@ -1,7 +1,8 @@
 import { eq, and, inArray } from "drizzle-orm";
-import { ownedGames, steamAccounts, users } from "@steam-eye/database/schema";
+import { accounts, ownedGames, steamAccounts, users } from "@steam-eye/database/schema";
 import {
   compareGamesSchema,
+  compareByDiscordIdSchema,
   hideGameSchema,
   listUserGamesSchema,
 } from "@steam-eye/data-schemas";
@@ -105,6 +106,69 @@ export const compareGames = authedProcedure
     return { shared, onlyCurrentUser, onlyTargetUser };
   });
 
+export const compareByDiscordId = authedProcedure
+  .input(compareByDiscordIdSchema)
+  .handler(async ({ input, context }) => {
+    const targetAccount = await context.database.query.accounts.findFirst({
+      where: and(
+        eq(accounts.accountId, input.discordId),
+        eq(accounts.providerId, "discord"),
+      ),
+    });
+
+    if (!targetAccount) {
+      return { found: false as const };
+    }
+
+    if (targetAccount.userId === context.userId) {
+      return { isSelf: true as const };
+    }
+
+    const currentUserAccounts = await context.database.query.steamAccounts.findMany({
+      where: eq(steamAccounts.userId, context.userId),
+    });
+
+    const targetUserAccounts = await context.database.query.steamAccounts.findMany({
+      where: eq(steamAccounts.userId, targetAccount.userId),
+    });
+
+    if (currentUserAccounts.length === 0 || targetUserAccounts.length === 0) {
+      return { found: false as const };
+    }
+
+    const currentAccountIds = currentUserAccounts.map((account) => account.id);
+    const targetAccountIds = targetUserAccounts.map((account) => account.id);
+
+    const currentUserGames = await context.database.query.ownedGames.findMany({
+      where: and(
+        inArray(ownedGames.steamAccountId, currentAccountIds),
+        eq(ownedGames.hidden, false),
+      ),
+      with: { game: true },
+    });
+
+    const targetUserGames = await context.database.query.ownedGames.findMany({
+      where: and(
+        inArray(ownedGames.steamAccountId, targetAccountIds),
+        eq(ownedGames.hidden, false),
+      ),
+      with: { game: true },
+    });
+
+    const targetUserAppIds = new Set(targetUserGames.map((game) => game.appId));
+    const sharedGames = currentUserGames.filter((game) =>
+      targetUserAppIds.has(game.appId),
+    );
+
+    return {
+      found: true as const,
+      sharedGames,
+      sharedCount: sharedGames.length,
+      currentUserGameCount: currentUserGames.length,
+      targetUserGameCount: targetUserGames.length,
+    };
+  });
+
 export const setGameVisibility = authedProcedure
   .input(hideGameSchema)
   .handler(async ({ input, context }) => {
@@ -133,5 +197,6 @@ export const libraryRouter = {
   myGames: listMyGames,
   userGames: listUserGames,
   compare: compareGames,
+  compareByDiscordId: compareByDiscordId,
   setVisibility: setGameVisibility,
 };

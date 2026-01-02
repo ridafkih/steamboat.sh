@@ -32,9 +32,14 @@ export const listUserGamesSchema = type({
   userId: "string",
 });
 
+export const compareByDiscordIdSchema = type({
+  discordId: "string",
+});
+
 export type GameId = typeof gameIdSchema.infer;
 export type SearchGames = typeof searchGamesSchema.infer;
 export type CreateGame = typeof createGameSchema.infer;
 export type CompareGames = typeof compareGamesSchema.infer;
 export type HideGame = typeof hideGameSchema.infer;
 export type ListUserGames = typeof listUserGamesSchema.infer;
+export type CompareByDiscordId = typeof compareByDiscordIdSchema.infer;
