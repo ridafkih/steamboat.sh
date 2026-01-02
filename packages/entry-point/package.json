@@ -1,0 +1,19 @@
+{
+  "name": "@steam-eye/entry-point",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@steam-eye/log": "workspace:*",
+    "arkenv": "0.8.1"
+  },
+  "devDependencies": {
+    "@steam-eye/typescript-config": "workspace:*",
+    "typescript": "5.9.3"
+  }
+}
