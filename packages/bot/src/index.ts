@@ -30,10 +30,15 @@ entry("bot")
   .env({
     DISCORD_TOKEN: "string>0",
     API_URL: "string.url",
+    API_KEY: "string>0",
     WEB_URL: "string.url",
   })
   .setup(({ env }) => {
-    const api = createClient({ baseUrl: env.API_URL, credentials: "omit" });
+    const api = createClient({
+      baseUrl: env.API_URL,
+      credentials: "omit",
+      apiKey: env.API_KEY,
+    });
     return { discordToken: env.DISCORD_TOKEN, api, webUrl: env.WEB_URL };
   })
   .run(async ({ discordToken, api, webUrl, log, context }) => {
@@ -128,14 +133,33 @@ entry("bot")
         return;
       }
 
+      const comparison = await api.admin.discord.compareUsers({
+        invokerDiscordId: invokerId,
+        targetDiscordId: targetUser.id,
+      });
+
+      if (!comparison.found) {
+        interactionLogger.setAll({
+          outcome: "error",
+          responseType: "comparison_failed",
+        });
+        await interaction.editReply({
+          content: "Something went wrong while comparing libraries. Please try again.",
+        });
+        return;
+      }
+
       interactionLogger.setAll({
         outcome: "success",
         responseType: "compare_link",
+        sharedCount: comparison.sharedCount,
+        invokerGameCount: comparison.invokerGameCount,
+        targetGameCount: comparison.targetGameCount,
       });
 
       const compareUrl = new URL(`/compare/${targetUser.id}`, webUrl);
       await interaction.editReply({
-        content: `View your shared games with <@${targetUser.id}>:\n${compareUrl}`,
+        content: `You share **${comparison.sharedCount}** games with <@${targetUser.id}>!\n${compareUrl}`,
       });
     };
 

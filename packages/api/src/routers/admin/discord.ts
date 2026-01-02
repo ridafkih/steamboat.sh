@@ -1,10 +1,14 @@
-import { eq, inArray } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import {
+  accounts,
   discordServerMembers,
   steamAccounts,
   ownedGames,
 } from "@steam-eye/database/schema";
-import { adminServerIdSchema } from "@steam-eye/data-schemas";
+import {
+  adminServerIdSchema,
+  adminCompareDiscordUsersSchema,
+} from "@steam-eye/data-schemas";
 import { adminProcedure } from "../../orpc";
 
 export const getServerUsers = adminProcedure
@@ -60,9 +64,76 @@ export const getServerGames = adminProcedure
     return Array.from(uniqueGames.values());
   });
 
+export const compareDiscordUsers = adminProcedure
+  .input(adminCompareDiscordUsersSchema)
+  .handler(async ({ input, context }) => {
+    const [invokerAccount, targetAccount] = await Promise.all([
+      context.database.query.accounts.findFirst({
+        where: and(
+          eq(accounts.accountId, input.invokerDiscordId),
+          eq(accounts.providerId, "discord"),
+        ),
+      }),
+      context.database.query.accounts.findFirst({
+        where: and(
+          eq(accounts.accountId, input.targetDiscordId),
+          eq(accounts.providerId, "discord"),
+        ),
+      }),
+    ]);
+
+    if (!invokerAccount || !targetAccount) {
+      return { found: false as const };
+    }
+
+    const [invokerSteamAccounts, targetSteamAccounts] = await Promise.all([
+      context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, invokerAccount.userId),
+      }),
+      context.database.query.steamAccounts.findMany({
+        where: eq(steamAccounts.userId, targetAccount.userId),
+      }),
+    ]);
+
+    if (invokerSteamAccounts.length === 0 || targetSteamAccounts.length === 0) {
+      return { found: false as const };
+    }
+
+    const invokerAccountIds = invokerSteamAccounts.map((account) => account.id);
+    const targetAccountIds = targetSteamAccounts.map((account) => account.id);
+
+    const [invokerGames, targetGames] = await Promise.all([
+      context.database.query.ownedGames.findMany({
+        where: and(
+          inArray(ownedGames.steamAccountId, invokerAccountIds),
+          eq(ownedGames.hidden, false),
+        ),
+      }),
+      context.database.query.ownedGames.findMany({
+        where: and(
+          inArray(ownedGames.steamAccountId, targetAccountIds),
+          eq(ownedGames.hidden, false),
+        ),
+      }),
+    ]);
+
+    const targetAppIds = new Set(targetGames.map((game) => game.appId));
+    const sharedCount = invokerGames.filter((game) =>
+      targetAppIds.has(game.appId),
+    ).length;
+
+    return {
+      found: true as const,
+      sharedCount,
+      invokerGameCount: invokerGames.length,
+      targetGameCount: targetGames.length,
+    };
+  });
+
 export const adminDiscordRouter = {
   servers: {
     users: getServerUsers,
     games: getServerGames,
   },
+  compareUsers: compareDiscordUsers,
 };
