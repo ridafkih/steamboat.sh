@@ -6,12 +6,12 @@ import { verifyApiKey, markApiKeyUsed } from "./utils/api-key";
 export type Context = {
   database: DatabaseClient;
   log: RequestLogger;
-  userId: number | undefined;
+  userId: string | undefined;
   apiKey: string | undefined;
 };
 
 export type AuthedContext = Omit<Context, "userId" | "apiKey"> & {
-  userId: number;
+  userId: string;
 };
 
 export type AdminContext = Omit<Context, "userId" | "apiKey">;

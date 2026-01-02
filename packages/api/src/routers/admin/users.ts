@@ -1,11 +1,11 @@
-import { eq, or } from "drizzle-orm";
-import { users, steamAccounts } from "@steam-eye/database/schema";
+import { eq, and } from "drizzle-orm";
+import { users, steamAccounts, accounts } from "@steam-eye/database/schema";
 import { adminUserIdSchema, adminUsersQuerySchema } from "@steam-eye/data-schemas";
 import { adminProcedure } from "../../orpc";
 
 export const listUsers = adminProcedure.handler(async ({ context }) => {
   const allUsers = await context.database.query.users.findMany({
-    with: { steamAccounts: true },
+    with: { steamAccounts: true, accounts: true },
   });
   return allUsers;
 });
@@ -15,7 +15,7 @@ export const getUser = adminProcedure
   .handler(async ({ input, context }) => {
     const user = await context.database.query.users.findFirst({
       where: eq(users.id, input.userId),
-      with: { steamAccounts: true },
+      with: { steamAccounts: true, accounts: true },
     });
     return user;
   });
@@ -28,19 +28,22 @@ export const searchUsers = adminProcedure
     }
 
     if (input.steamId) {
-      const account = await context.database.query.steamAccounts.findFirst({
+      const steamAccount = await context.database.query.steamAccounts.findFirst({
         where: eq(steamAccounts.steamId, input.steamId),
-        with: { user: { with: { steamAccounts: true } } },
+        with: { user: { with: { steamAccounts: true, accounts: true } } },
       });
-      return account?.user ? [account.user] : [];
+      return steamAccount?.user ? [steamAccount.user] : [];
     }
 
     if (input.discordId) {
-      const user = await context.database.query.users.findFirst({
-        where: eq(users.discordId, input.discordId),
-        with: { steamAccounts: true },
+      const discordAccount = await context.database.query.accounts.findFirst({
+        where: and(
+          eq(accounts.providerId, "discord"),
+          eq(accounts.accountId, input.discordId)
+        ),
+        with: { user: { with: { steamAccounts: true, accounts: true } } },
       });
-      return user ? [user] : [];
+      return discordAccount?.user ? [discordAccount.user] : [];
     }
 
     return [];
