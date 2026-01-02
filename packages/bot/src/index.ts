@@ -5,7 +5,7 @@ import { entry } from "@steam-eye/entry-point";
 entry("bot")
   .env({ DISCORD_TOKEN: "string>0", API_URL: "string.url" })
   .setup(({ env }) => {
-    const api = createClient(env.API_URL);
+    const api = createClient({ baseUrl: env.API_URL });
     return { discordToken: env.DISCORD_TOKEN, api };
   })
   .run(async ({ discordToken, api, context }) => {
