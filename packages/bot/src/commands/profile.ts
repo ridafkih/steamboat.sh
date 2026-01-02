@@ -1,3 +1,4 @@
+import { MessageFlags } from "discord.js";
 import type { CommandContext, SubcommandDefinition } from "../types";
 
 export default ({ api, webUrl }: CommandContext): SubcommandDefinition => ({
@@ -30,12 +31,12 @@ export default ({ api, webUrl }: CommandContext): SubcommandDefinition => ({
       });
       await interaction.reply({
         content: "Bots don't have Steam profiles!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const profile = await api.admin.discord.getSteamProfile({
       discordId: targetUser.id,

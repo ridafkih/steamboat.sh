@@ -1,4 +1,4 @@
-import { Events, type Interaction } from "discord.js";
+import { Events, MessageFlags, type Interaction } from "discord.js";
 import { createInteractionLogger } from "@steamboat/log";
 import type { EventContext, EventDefinition } from "../types";
 
@@ -54,7 +54,7 @@ export default ({ subcommands, log }: EventContext): EventDefinition => ({
       if (interaction.deferred) {
         await interaction.editReply({ content: errorMessage });
       } else {
-        await interaction.reply({ content: errorMessage, ephemeral: true });
+        await interaction.reply({ content: errorMessage, flags: MessageFlags.Ephemeral });
       }
     } finally {
       interactionLogger.emit();

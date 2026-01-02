@@ -1,3 +1,4 @@
+import { MessageFlags } from "discord.js";
 import type { CommandContext, SubcommandDefinition } from "../types";
 
 export default ({ api, webUrl }: CommandContext): SubcommandDefinition => ({
@@ -30,7 +31,7 @@ export default ({ api, webUrl }: CommandContext): SubcommandDefinition => ({
       });
       await interaction.reply({
         content: "You can't compare your library with yourself!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
@@ -42,12 +43,12 @@ export default ({ api, webUrl }: CommandContext): SubcommandDefinition => ({
       });
       await interaction.reply({
         content: "You can't compare your library with a bot!",
-        ephemeral: true,
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
     const [invokerStatus, targetStatus] = await Promise.all([
       api.library.checkDiscordLinkStatus({ discordId: invokerId }),
