@@ -65,6 +65,9 @@ export const GamesLibrary = () => {
   );
 };
 
+const getSteamStoreUrl = (appId: number) =>
+  `https://store.steampowered.com/app/${appId}`;
+
 const GameCard = ({ game }: { game: Game }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -73,7 +76,12 @@ const GameCard = ({ game }: { game: Game }) => {
   };
 
   return (
-    <div className="group relative overflow-hidden">
+    <a
+      href={getSteamStoreUrl(game.appId)}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group relative overflow-hidden"
+    >
       <div className="aspect-2/3 overflow-hidden bg-card border rounded-sm">
         <img
           src={
@@ -90,6 +98,6 @@ const GameCard = ({ game }: { game: Game }) => {
       <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
         <p className="truncate text-sm font-medium text-white">{game.name}</p>
       </div>
-    </div>
+    </a>
   );
 };
