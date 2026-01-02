@@ -3,8 +3,16 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import type { DatabaseClient } from "@steam-eye/database";
 import * as schema from "@steam-eye/database/schema";
 
-export const createAuth = (database: DatabaseClient) => {
+type CreateAuthOptions = {
+  trustedOrigins: string[];
+};
+
+export const createAuth = (
+  database: DatabaseClient,
+  { trustedOrigins }: CreateAuthOptions,
+) => {
   return betterAuth({
+    trustedOrigins,
     database: drizzleAdapter(database, {
       provider: "pg",
       schema: {

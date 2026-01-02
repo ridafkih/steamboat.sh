@@ -6,9 +6,27 @@ import { router } from "./routers";
 import { bootstrap } from "./utils/bootstrap";
 import { createAuth } from "./auth";
 
+const createCorsHeaders = (origin: string) => ({
+  "Access-Control-Allow-Origin": origin,
+  "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type, Authorization",
+  "Access-Control-Allow-Credentials": "true",
+});
+
+const createWithCors = (corsHeaders: Record<string, string>) => {
+  return (response: Response): Response => {
+    const newResponse = new Response(response.body, response);
+    for (const [key, value] of Object.entries(corsHeaders)) {
+      newResponse.headers.set(key, value);
+    }
+    return newResponse;
+  };
+};
+
 entry("api")
   .env({
     DATABASE_URL: "string.url",
+    CORS_ORIGIN: "string.url",
     DISCORD_CLIENT_ID: "string",
     DISCORD_CLIENT_SECRET: "string",
     BETTER_AUTH_SECRET: "string",
@@ -16,11 +34,13 @@ entry("api")
   })
   .setup(({ env }) => {
     const database = createDatabase(env.DATABASE_URL);
-    const auth = createAuth(database);
+    const auth = createAuth(database, { trustedOrigins: [env.CORS_ORIGIN] });
     const rpcHandler = new RPCHandler(router);
-    return { database, auth, rpcHandler };
+    const corsHeaders = createCorsHeaders(env.CORS_ORIGIN);
+    const withCors = createWithCors(corsHeaders);
+    return { database, auth, rpcHandler, corsHeaders, withCors };
   })
-  .run(async ({ log, rpcHandler, database, auth, context }) => {
+  .run(async ({ log, rpcHandler, database, auth, corsHeaders, withCors, context }) => {
     const port = 3001;
     const { ready } = await bootstrap(database);
 
@@ -36,15 +56,20 @@ entry("api")
           path: url.pathname,
         });
 
+        if (request.method === "OPTIONS") {
+          requestLogger.emit({ statusCode: 204 });
+          return new Response(null, { status: 204, headers: corsHeaders });
+        }
+
         if (url.pathname === "/health") {
           requestLogger.emit({ statusCode: 200 });
-          return Response.json({ ready });
+          return withCors(Response.json({ ready }));
         }
 
         if (url.pathname.startsWith("/api/auth")) {
           const response = await auth.handler(request);
           requestLogger.emit({ statusCode: response.status });
-          return response;
+          return withCors(response);
         }
 
         if (url.pathname.startsWith("/rpc")) {
@@ -63,12 +88,12 @@ entry("api")
 
           if (matched && response) {
             requestLogger.emit({ statusCode: response.status });
-            return response;
+            return withCors(response);
           }
         }
 
         requestLogger.emit({ statusCode: 404 });
-        return new Response("Not Found", { status: 404 });
+        return withCors(new Response("Not Found", { status: 404 }));
       },
     });
   });
