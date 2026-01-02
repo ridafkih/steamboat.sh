@@ -2,6 +2,6 @@
 set -e
 
 cd /app/packages/database
-drizzle-kit migrate
+bunx drizzle-kit migrate
 cd /app
 exec bun packages/api/dist/index.js
