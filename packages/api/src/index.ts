@@ -2,6 +2,11 @@ import { RPCHandler } from "@orpc/server/fetch";
 import { createDatabase } from "@steam-eye/database";
 import { entry } from "@steam-eye/entry-point";
 import { createRequestLogger } from "@steam-eye/log/request";
+import {
+  createSteamAuth,
+  linkSteamAccount,
+  SteamAccountAlreadyLinkedError,
+} from "@steam-eye/steam";
 import { router } from "./routers";
 import { bootstrap } from "./utils/bootstrap";
 import { createAuth } from "./auth";
@@ -31,16 +36,24 @@ entry("api")
     DISCORD_CLIENT_SECRET: "string",
     BETTER_AUTH_SECRET: "string",
     BETTER_AUTH_URL: "string.url",
+    STEAM_API_KEY: "string",
+    STEAM_REALM: "string.url",
   })
   .setup(({ env }) => {
     const database = createDatabase(env.DATABASE_URL);
     const auth = createAuth(database, { trustedOrigins: [env.CORS_ORIGIN] });
+    const steamCallbackUrl = new URL("/api/steam/callback", env.STEAM_REALM);
+    const steamAuth = createSteamAuth({
+      realm: env.STEAM_REALM,
+      returnUrl: steamCallbackUrl.toString(),
+      apiKey: env.STEAM_API_KEY,
+    });
     const rpcHandler = new RPCHandler(router);
     const corsHeaders = createCorsHeaders(env.CORS_ORIGIN);
     const withCors = createWithCors(corsHeaders);
-    return { database, auth, rpcHandler, corsHeaders, withCors };
+    return { database, auth, steamAuth, rpcHandler, corsHeaders, withCors, env };
   })
-  .run(async ({ log, rpcHandler, database, auth, corsHeaders, withCors, context }) => {
+  .run(async ({ log, rpcHandler, database, auth, steamAuth, corsHeaders, withCors, env, context }) => {
     const port = 3001;
     const { ready } = await bootstrap(database);
 
@@ -70,6 +83,48 @@ entry("api")
           const response = await auth.handler(request);
           requestLogger.emit({ statusCode: response.status });
           return withCors(response);
+        }
+
+        if (url.pathname === "/api/steam/link") {
+          const session = await auth.api.getSession({ headers: request.headers });
+          if (!session?.user) {
+            requestLogger.emit({ statusCode: 401 });
+            return withCors(new Response("Unauthorized", { status: 401 }));
+          }
+          const redirectUrl = await steamAuth.getRedirectUrl();
+          requestLogger.emit({ statusCode: 302 });
+          return new Response(null, {
+            status: 302,
+            headers: { Location: redirectUrl },
+          });
+        }
+
+        if (url.pathname === "/api/steam/callback") {
+          const session = await auth.api.getSession({ headers: request.headers });
+          const errorRedirectUrl = new URL(env.CORS_ORIGIN);
+
+          if (!session?.user) {
+            errorRedirectUrl.searchParams.set("error", "unauthorized");
+            requestLogger.emit({ statusCode: 302 });
+            return Response.redirect(errorRedirectUrl.toString(), 302);
+          }
+
+          try {
+            const steamUser = await steamAuth.authenticate(request);
+            await linkSteamAccount(database, session.user.id, steamUser);
+            const successRedirectUrl = new URL(env.CORS_ORIGIN);
+            successRedirectUrl.searchParams.set("steam", "linked");
+            requestLogger.emit({ statusCode: 302 });
+            return Response.redirect(successRedirectUrl.toString(), 302);
+          } catch (error) {
+            if (error instanceof SteamAccountAlreadyLinkedError) {
+              errorRedirectUrl.searchParams.set("error", "steam-already-linked");
+            } else {
+              errorRedirectUrl.searchParams.set("error", "steam-link-failed");
+            }
+            requestLogger.emit({ statusCode: 302 });
+            return Response.redirect(errorRedirectUrl.toString(), 302);
+          }
         }
 
         if (url.pathname.startsWith("/rpc")) {

@@ -19,6 +19,7 @@
     "@steam-eye/database": "workspace:*",
     "@steam-eye/entry-point": "workspace:*",
     "@steam-eye/log": "workspace:*",
+    "@steam-eye/steam": "workspace:*",
     "better-auth": "^1.4.10",
     "drizzle-orm": "0.45.1"
   },

@@ -5,9 +5,20 @@ import type { router } from "./routers";
 
 type AppRouter = typeof router;
 
-export const createClient = (baseUrl: string): RouterClient<AppRouter> => {
+type CreateClientOptions = {
+  baseUrl: string;
+  credentials?: "include" | "omit" | "same-origin";
+};
+
+export const createClient = ({ baseUrl, credentials }: CreateClientOptions): RouterClient<AppRouter> => {
+  const rpcUrl = new URL("/rpc", baseUrl);
   const link = new RPCLink({
-    url: `${baseUrl}/rpc`,
+    url: rpcUrl.toString(),
+    fetch: (input, init) =>
+      fetch(input, {
+        ...init,
+        credentials: credentials ?? "include",
+      }),
   });
 
   return createORPCClient(link);
