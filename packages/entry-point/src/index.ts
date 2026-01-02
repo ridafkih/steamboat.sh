@@ -140,18 +140,16 @@ export const entry = <const ServiceName extends string>(
           emitCanonicalLog("info", "entry point started");
         } catch (error) {
           flags.add("failed");
-          context.set(
-            "error.type",
-            error instanceof Error ? error.name : "UnknownError",
-          );
-          context.set(
-            "error.message",
-            error instanceof Error ? error.message : String(error),
-          );
-          context.set(
-            "error.stack",
-            error instanceof Error ? error.stack : undefined,
-          );
+
+          const name = error instanceof Error ? error.name : undefined;
+          const message =
+            error instanceof Error ? error.message : String(error);
+          const stack = error instanceof Error ? error.stack : String(error);
+
+          context.set("error.name", name);
+          context.set("error.message", message);
+          context.set("error.stack", stack);
+
           clearTimeout(timeoutId);
           emitCanonicalLog("fatal", "entry point failed");
           process.exit(1);
@@ -195,8 +193,8 @@ export const entry = <const ServiceName extends string>(
           try {
             const env = validateEnvironment();
             flags.add("env-validated");
-
             flags.add("setup-running");
+
             const setupResult = await callback({ env });
 
             if (!isObjectWithKeysOfType<SetupExtension>(setupResult)) {
@@ -221,18 +219,16 @@ export const entry = <const ServiceName extends string>(
             emitCanonicalLog("info", "entry point started");
           } catch (error) {
             flags.add("failed");
-            context.set(
-              "error.type",
-              error instanceof Error ? error.name : "UnknownError",
-            );
-            context.set(
-              "error.message",
-              error instanceof Error ? error.message : String(error),
-            );
-            context.set(
-              "error.stack",
-              error instanceof Error ? error.stack : undefined,
-            );
+
+            const name = error instanceof Error ? error.name : undefined;
+            const message =
+              error instanceof Error ? error.message : String(error);
+            const stack = error instanceof Error ? error.stack : String(error);
+
+            context.set("error.name", name);
+            context.set("error.message", message);
+            context.set("error.stack", stack);
+
             clearTimeout(timeoutId);
             emitCanonicalLog("fatal", "entry point failed");
             process.exit(1);

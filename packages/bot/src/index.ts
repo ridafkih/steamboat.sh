@@ -8,14 +8,17 @@ entry("bot")
     const api = createClient(env.API_URL);
     return { discordToken: env.DISCORD_TOKEN, api };
   })
-  .run(async ({ discordToken, api, log }) => {
+  .run(async ({ discordToken, api, context }) => {
     const client = new Client({
       intents: [GatewayIntentBits.Guilds],
     });
 
-    client.once(Events.ClientReady, (readyClient) => {
-      log.info({ tag: readyClient.user.tag }, "bot ready");
+    const readyClient = await new Promise<Client<true>>((resolve) => {
+      client.once(Events.ClientReady, resolve);
+      client.login(discordToken);
     });
 
-    await client.login(discordToken);
+    context.set("discord.tag", readyClient.user.tag);
+    context.set("discord.id", readyClient.user.id);
+    context.set("discord.guildCount", readyClient.guilds.cache.size);
   });

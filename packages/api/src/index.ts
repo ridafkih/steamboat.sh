@@ -12,16 +12,19 @@ entry("api")
     const handler = new RPCHandler(router);
     return { database, handler };
   })
-  .run(async ({ log, handler, database }) => {
+  .run(async ({ log, handler, database, context }) => {
+    const port = 3001;
     const { ready } = await bootstrap(database);
 
+    context.set("port", port);
+    context.set("bootstrap.ready", ready);
+
     if (!ready) {
-      log.fatal("server is misconfigured");
-      process.exit(1);
+      throw new Error("Server is misconfigured");
     }
 
     Bun.serve({
-      port: 3001,
+      port,
       fetch: async (request) => {
         const url = new URL(request.url);
         const requestLogger = createRequestLogger(log, {
@@ -57,6 +60,4 @@ entry("api")
         return new Response("Not Found", { status: 404 });
       },
     });
-
-    log.info({ port: 3001 }, "api server started");
   });
