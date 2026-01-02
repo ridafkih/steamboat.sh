@@ -13,9 +13,10 @@ COPY --from=prune /app/out/full/ .
 RUN bun run --cwd packages/web build
 
 FROM base AS runtime
-COPY --from=build /app/packages/web/dist ./dist
+COPY --from=build /app/packages/web/dist ./packages/web/dist
+COPY --from=build /app/packages/web/server.ts ./packages/web/server.ts
 
 ENV NODE_ENV=production
 EXPOSE 3000
 
-CMD ["bun", "dist/server.js"]
+CMD ["bun", "packages/web/server.ts"]
