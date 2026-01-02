@@ -39,3 +39,4 @@ export const log = pino({
 export type Logger = typeof log;
 
 export { DEFAULT_REDACT_PATHS };
+export { createInteractionLogger, type InteractionLogger, type InteractionContext } from "./interaction";

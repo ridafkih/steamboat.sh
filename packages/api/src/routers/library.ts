@@ -5,6 +5,7 @@ import {
   compareByDiscordIdSchema,
   hideGameSchema,
   listUserGamesSchema,
+  checkDiscordLinkStatusSchema,
 } from "@steam-eye/data-schemas";
 import { publicProcedure, authedProcedure } from "../orpc";
 
@@ -193,10 +194,35 @@ export const setGameVisibility = authedProcedure
     return { success: true };
   });
 
+export const checkDiscordLinkStatus = publicProcedure
+  .input(checkDiscordLinkStatusSchema)
+  .handler(async ({ input, context }) => {
+    const discordAccount = await context.database.query.accounts.findFirst({
+      where: and(
+        eq(accounts.accountId, input.discordId),
+        eq(accounts.providerId, "discord"),
+      ),
+    });
+
+    if (!discordAccount) {
+      return { hasAccount: false, hasSteamLinked: false };
+    }
+
+    const userSteamAccounts = await context.database.query.steamAccounts.findMany({
+      where: eq(steamAccounts.userId, discordAccount.userId),
+    });
+
+    return {
+      hasAccount: true,
+      hasSteamLinked: userSteamAccounts.length > 0,
+    };
+  });
+
 export const libraryRouter = {
   myGames: listMyGames,
   userGames: listUserGames,
   compare: compareGames,
   compareByDiscordId: compareByDiscordId,
   setVisibility: setGameVisibility,
+  checkDiscordLinkStatus: checkDiscordLinkStatus,
 };
