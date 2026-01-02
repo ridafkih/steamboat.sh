@@ -1,16 +1,21 @@
 import { Client, Events, GatewayIntentBits } from "discord.js";
-import { createDatabase } from "@steam-eye/database";
-import { log } from "@steam-eye/log";
+import { createClient } from "@steam-eye/api/client";
+import { entry } from "@steam-eye/entry-point";
 
-const logger = log.child({ module: "discord-bot" });
-const database = createDatabase("steam-eye.db");
+entry("bot")
+  .env({ DISCORD_TOKEN: "string", API_URL: "string.url" })
+  .setup(({ env }) => {
+    const api = createClient(env.API_URL);
+    return { discordToken: env.DISCORD_TOKEN, api };
+  })
+  .run(async ({ discordToken, api, log }) => {
+    const client = new Client({
+      intents: [GatewayIntentBits.Guilds],
+    });
 
-const client = new Client({
-  intents: [GatewayIntentBits.Guilds],
-});
+    client.once(Events.ClientReady, (readyClient) => {
+      log.info({ tag: readyClient.user.tag }, "bot ready");
+    });
 
-client.once(Events.ClientReady, (readyClient) => {
-  logger.info({ tag: readyClient.user.tag }, "bot ready");
-});
-
-client.login(process.env.DISCORD_TOKEN);
+    await client.login(discordToken);
+  });

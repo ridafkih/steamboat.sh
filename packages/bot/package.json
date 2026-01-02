@@ -9,8 +9,10 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "@steam-eye/database": "workspace:*",
+    "@steam-eye/api": "workspace:*",
+    "@steam-eye/entry-point": "workspace:*",
     "@steam-eye/log": "workspace:*",
+    "arkenv": "0.8.1",
     "discord.js": "^14.16.0"
   },
   "devDependencies": {
