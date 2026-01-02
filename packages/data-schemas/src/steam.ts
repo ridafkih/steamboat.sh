@@ -22,7 +22,7 @@ export type SteamOwnedGame = typeof steamOwnedGameSchema.infer;
 
 export const steamOwnedGamesResponseSchema = type({
   response: {
-    game_count: "number",
+    "game_count?": "number",
     "games?": steamOwnedGameSchema.array(),
   },
 });
