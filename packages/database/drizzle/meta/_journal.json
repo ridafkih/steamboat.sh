@@ -15,6 +15,13 @@
       "when": 1767332653326,
       "tag": "0001_natural_christian_walker",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1767387393718,
+      "tag": "0002_wise_starbolt",
+      "breakpoints": true
     }
   ]
 }

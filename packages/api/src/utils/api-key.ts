@@ -12,9 +12,7 @@ export const verifyApiKey = async (
   database: DatabaseClient,
   plainKey: string,
 ): Promise<VerifyResult> => {
-  const keys = await database.query.apiKeys.findMany({
-    where: eq(apiKeys.used, false),
-  });
+  const keys = await database.query.apiKeys.findMany();
 
   for (const key of keys) {
     const isValid = await Bun.password.verify(plainKey, key.hash);
@@ -26,16 +24,12 @@ export const verifyApiKey = async (
   return { valid: false, key: undefined };
 };
 
-export const markApiKeyUsed = async (
+export const updateApiKeyLastUsed = async (
   database: DatabaseClient,
   keyId: number,
-  oneTimeUse: boolean,
 ): Promise<void> => {
   await database
     .update(apiKeys)
-    .set({
-      used: oneTimeUse ? true : undefined,
-      lastUsedAt: new Date(),
-    })
+    .set({ lastUsedAt: new Date() })
     .where(eq(apiKeys.id, keyId));
 };

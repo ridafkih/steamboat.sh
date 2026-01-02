@@ -227,8 +227,6 @@ export const apiKeys = pgTable("api_keys", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   hash: text("hash").notNull(),
-  oneTimeUse: boolean("one_time_use").notNull().default(false),
-  used: boolean("used").notNull().default(false),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   lastUsedAt: timestamp("last_used_at"),
 });

@@ -1,7 +1,7 @@
 import { os, ORPCError } from "@orpc/server";
 import type { DatabaseClient } from "@steamboat/database";
 import type { RequestLogger } from "@steamboat/log/request";
-import { verifyApiKey, markApiKeyUsed } from "./utils/api-key";
+import { verifyApiKey, updateApiKeyLastUsed } from "./utils/api-key";
 
 export type Context = {
   database: DatabaseClient;
@@ -11,7 +11,10 @@ export type Context = {
   steamApiKey: string;
 };
 
-export type AuthedContext = Pick<Context, "database" | "log" | "steamApiKey"> & {
+export type AuthedContext = Pick<
+  Context,
+  "database" | "log" | "steamApiKey"
+> & {
   userId: string;
 };
 
@@ -47,10 +50,10 @@ export const adminProcedure = publicProcedure.use(async ({ context, next }) => {
     throw new ORPCError("UNAUTHORIZED");
   }
 
-  await markApiKeyUsed(context.database, result.key.id, result.key.oneTimeUse);
+  await updateApiKeyLastUsed(context.database, result.key.id);
 
-  context.log.set("admin", true);
   context.log.set("apiKeyId", result.key.id);
+  context.log.set("apiKeyName", result.key.name);
 
   return next({
     context: {
