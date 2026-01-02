@@ -149,11 +149,11 @@ export const getSteamProfile = adminProcedure
       where: eq(steamAccounts.userId, discordAccount.userId),
     });
 
-    if (userSteamAccounts.length === 0) {
+    const primaryAccount = userSteamAccounts[0];
+
+    if (!primaryAccount) {
       return { found: false as const };
     }
-
-    const primaryAccount = userSteamAccounts[0];
 
     return {
       found: true as const,

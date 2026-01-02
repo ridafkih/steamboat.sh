@@ -8,13 +8,14 @@ export type Context = {
   log: RequestLogger;
   userId: string | undefined;
   apiKey: string | undefined;
+  steamApiKey: string;
 };
 
-export type AuthedContext = Omit<Context, "userId" | "apiKey"> & {
+export type AuthedContext = Pick<Context, "database" | "log" | "steamApiKey"> & {
   userId: string;
 };
 
-export type AdminContext = Omit<Context, "userId" | "apiKey">;
+export type AdminContext = Pick<Context, "database" | "log" | "steamApiKey">;
 
 export const publicProcedure = os.$context<Context>();
 
@@ -29,6 +30,7 @@ export const authedProcedure = publicProcedure.use(({ context, next }) => {
     context: {
       database: context.database,
       log: context.log,
+      steamApiKey: context.steamApiKey,
       userId: context.userId,
     } satisfies AuthedContext,
   });
@@ -54,6 +56,7 @@ export const adminProcedure = publicProcedure.use(async ({ context, next }) => {
     context: {
       database: context.database,
       log: context.log,
+      steamApiKey: context.steamApiKey,
     } satisfies AdminContext,
   });
 });

@@ -211,6 +211,7 @@ entry("api")
                 log: requestLogger,
                 userId: session?.user?.id,
                 apiKey,
+                steamApiKey: env.STEAM_API_KEY,
               },
             });
 

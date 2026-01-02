@@ -16,6 +16,10 @@ import { useLinkedAccounts } from "@/lib/hooks/use-linked-accounts";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL;
 
+if (!apiBaseUrl) {
+  throw new Error("VITE_API_URL is required");
+}
+
 export const LinkSteamAccountCard = () => {
   const { data: steamAccounts, isLoading, mutate } = useLinkedAccounts();
   const [unlinkingAccountId, setUnlinkingAccountId] = useState<number | null>(

@@ -1,5 +1,5 @@
 import { join } from "node:path";
-import { createDatabase } from "@steamboat/database";
+import { createClient } from "@steamboat/api/client";
 import { entry } from "@steamboat/entry-point";
 import { getAllJobs } from "./utils/get-jobs";
 import { injectJobs } from "./utils/inject-jobs";
@@ -9,15 +9,19 @@ const jobsDirectory = join(import.meta.dir, "jobs");
 
 entry("cron")
   .env({
-    DATABASE_URL: "string.url",
-    STEAM_API_KEY: "string",
+    API_URL: "string.url",
+    API_KEY: "string",
   })
   .setup(({ env }) => {
-    const database = createDatabase(env.DATABASE_URL);
-    return { database, env };
+    const api = createClient({
+      baseUrl: env.API_URL,
+      credentials: "omit",
+      apiKey: env.API_KEY,
+    });
+    return { api };
   })
-  .run(async ({ log, database, env, context }) => {
-    const jobs = await getAllJobs(jobsDirectory, { database, env, log });
+  .run(async ({ log, api, context }) => {
+    const jobs = await getAllJobs(jobsDirectory, { api, log });
     const injectedJobs = injectJobs(jobs, log);
     const registeredJobs = registerJobs(injectedJobs, log);
 

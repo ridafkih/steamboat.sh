@@ -1,15 +1,9 @@
 import type { CronOptions } from "cronbake";
-import type { DatabaseClient } from "@steamboat/database";
+import type { Client } from "@steamboat/api/client";
 import type { Logger } from "@steamboat/log";
 
-export type CronEnv = {
-  DATABASE_URL: string;
-  STEAM_API_KEY: string;
-};
-
 export type CronContext = {
-  database: DatabaseClient;
-  env: CronEnv;
+  api: Client;
   log: Logger;
 };
 

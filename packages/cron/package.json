@@ -9,12 +9,11 @@
     "types": "tsc --noEmit"
   },
   "dependencies": {
-    "@steamboat/database": "workspace:*",
+    "@orpc/client": "1.7.1",
+    "@steamboat/api": "workspace:*",
     "@steamboat/entry-point": "workspace:*",
     "@steamboat/log": "workspace:*",
-    "@steamboat/steam": "workspace:*",
-    "cronbake": "0.4.0",
-    "drizzle-orm": "0.45.1"
+    "cronbake": "0.4.0"
   },
   "devDependencies": {
     "@steamboat/typescript-config": "workspace:*",

@@ -5,10 +5,10 @@
     "": {
       "name": "steamboat",
       "devDependencies": {
-        "turbo": "^2.3.0",
+        "turbo": "^2.7.2",
       },
       "peerDependencies": {
-        "typescript": "^5",
+        "typescript": "^5.9.3",
       },
     },
     "packages/api": {
@@ -48,12 +48,11 @@
     "packages/cron": {
       "name": "@steamboat/cron",
       "dependencies": {
-        "@steamboat/database": "workspace:*",
+        "@orpc/client": "1.7.1",
+        "@steamboat/api": "workspace:*",
         "@steamboat/entry-point": "workspace:*",
         "@steamboat/log": "workspace:*",
-        "@steamboat/steam": "workspace:*",
         "cronbake": "0.4.0",
-        "drizzle-orm": "0.45.1",
       },
       "devDependencies": {
         "@steamboat/typescript-config": "workspace:*",
@@ -1000,6 +999,8 @@
 
     "@radix-ui/react-separator/@radix-ui/react-primitive": ["@radix-ui/react-primitive@2.1.4", "", { "dependencies": { "@radix-ui/react-slot": "1.2.4" }, "peerDependencies": { "@types/react": "*", "@types/react-dom": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc", "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react", "@types/react-dom"] }, "sha512-9hQc4+GNVtJAIEPEqlYqW5RiYdrr8ea5XQ0ZOnD6fgru+83kqT15mq2OCcbe8KnjRZl5vF3ks69AKz3kh1jrhg=="],
 
+    "@steamboat/cron/@orpc/client": ["@orpc/client@1.7.1", "", { "dependencies": { "@orpc/shared": "1.7.1", "@orpc/standard-server": "1.7.1", "@orpc/standard-server-fetch": "1.7.1", "@orpc/standard-server-peer": "1.7.1" } }, "sha512-96F87juE1uZl14pKHks6ZF9hQCLfW3nTZ1F75bV/6kyD10pY1EmcmArytLTjjlJLzGduWLEo4FwTXlOYsVsZOw=="],
+
     "@tailwindcss/oxide-wasm32-wasi/@emnapi/core": ["@emnapi/core@1.7.1", "", { "dependencies": { "@emnapi/wasi-threads": "1.1.0", "tslib": "^2.4.0" }, "bundled": true }, "sha512-o1uhUASyo921r2XtHYOHy7gdkGLge8ghBEQHMWmyJFoXlpU58kIrhhN3w26lpQb6dspetweapMn2CSNwQ8I4wg=="],
 
     "@tailwindcss/oxide-wasm32-wasi/@emnapi/runtime": ["@emnapi/runtime@1.7.1", "", { "dependencies": { "tslib": "^2.4.0" }, "bundled": true }, "sha512-PVtJr5CmLwYAU9PZDMITZoR5iAOShYREoR45EyyLrbntV50mdePTgUn4AmOw90Ifcj+x2kRjdzr1HP3RrNiHGA=="],
@@ -1072,6 +1073,14 @@
 
     "@esbuild-kit/core-utils/esbuild/@esbuild/win32-x64": ["@esbuild/win32-x64@0.18.20", "", { "os": "win32", "cpu": "x64" }, "sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ=="],
 
+    "@steamboat/cron/@orpc/client/@orpc/shared": ["@orpc/shared@1.7.1", "", { "dependencies": { "radash": "^12.1.1", "type-fest": "^4.39.1" } }, "sha512-m1rwIl0ZYNDOGrAdQeP9ijvElmq0il7Kqg4YUeCYYtPXokcfzf1ny+z0jQi8o8e7xWQVXnkztM2vBKhAMYIlaA=="],
+
+    "@steamboat/cron/@orpc/client/@orpc/standard-server": ["@orpc/standard-server@1.7.1", "", { "dependencies": { "@orpc/shared": "1.7.1" } }, "sha512-Zak77lyT8MYNRTbod7NSHfbz6HRVpXcVclm3RsAu3MpA1QdCITJkIvPKFm6/pDGskRNX0cEWpWXv7rHlllCH2A=="],
+
+    "@steamboat/cron/@orpc/client/@orpc/standard-server-fetch": ["@orpc/standard-server-fetch@1.7.1", "", { "dependencies": { "@orpc/shared": "1.7.1", "@orpc/standard-server": "1.7.1" } }, "sha512-EQPw5qaEwf8HrQvceQoQL4BLYvXfGVulVLLDL3e1knEWFSCHktoTCocXEzNwQPZnPMA8klO84mxhP/Tcl9AO/w=="],
+
+    "@steamboat/cron/@orpc/client/@orpc/standard-server-peer": ["@orpc/standard-server-peer@1.7.1", "", { "dependencies": { "@orpc/shared": "1.7.1", "@orpc/standard-server": "1.7.1" } }, "sha512-IOOKPZV7gnioHB1xghvV4fnZ4gv6HF7XPwizmmbeRB/ujR6F7SAYQ98JIS5tvMj/agL++8f9gLM1tqaCED1tGg=="],
+
     "tsx/esbuild/@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.27.2", "", { "os": "aix", "cpu": "ppc64" }, "sha512-GZMB+a0mOMZs4MpDbj8RJp4cw+w1WV5NYD6xzgvzUJ5Ek2jerwfO2eADyI6ExDSUED+1X8aMbegahsJi+8mgpw=="],
 
     "tsx/esbuild/@esbuild/android-arm": ["@esbuild/android-arm@0.27.2", "", { "os": "android", "cpu": "arm" }, "sha512-DVNI8jlPa7Ujbr1yjU2PfUSRtAUZPG9I1RwW4F4xFB1Imiu2on0ADiI/c3td+KmDtVKNbi+nffGDQMfcIMkwIA=="],
@@ -1123,5 +1132,7 @@
     "tsx/esbuild/@esbuild/win32-ia32": ["@esbuild/win32-ia32@0.27.2", "", { "os": "win32", "cpu": "ia32" }, "sha512-Iuws0kxo4yusk7sw70Xa2E2imZU5HoixzxfGCdxwBdhiDgt9vX9VUCBhqcwY7/uh//78A1hMkkROMJq9l27oLQ=="],
 
     "tsx/esbuild/@esbuild/win32-x64": ["@esbuild/win32-x64@0.27.2", "", { "os": "win32", "cpu": "x64" }, "sha512-sRdU18mcKf7F+YgheI/zGf5alZatMUTKj/jNS6l744f9u3WFu4v7twcUI9vu4mknF4Y9aDlblIie0IM+5xxaqQ=="],
+
+    "@steamboat/cron/@orpc/client/@orpc/shared/type-fest": ["type-fest@4.41.0", "", {}, "sha512-TeTSQ6H5YHvpqVwBRcnLDCBnDOHWYu7IvGbHT6N8AOymcr9PJGjc1GTtiWZTYg0NCgYwvnYWEkVChQAr9bjfwA=="],
   }
 }
