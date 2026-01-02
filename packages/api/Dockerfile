@@ -16,7 +16,9 @@ FROM base AS runtime
 COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile --production
 COPY --from=build /app/packages/api/dist ./packages/api/dist
-COPY --from=prune /app/out/full/packages/database ./packages/database
+COPY --from=prune /app/out/full/packages/database/src ./packages/database/src
+COPY --from=prune /app/out/full/packages/database/drizzle.config.ts ./packages/database/
+COPY --from=prune /app/packages/database/drizzle ./packages/database/drizzle
 
 ENV NODE_ENV=production
 EXPOSE 3001
