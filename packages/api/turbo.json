@@ -7,7 +7,7 @@
       "cache": false
     },
     "start": {
-      "dependsOn": [],
+      "dependsOn": ["migrate"],
       "cache": false,
       "passThroughEnv": [
         "DATABASE_URL",
