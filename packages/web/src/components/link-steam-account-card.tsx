@@ -25,7 +25,7 @@ export const LinkSteamAccountCard = () => {
 
   const handleLinkSteam = () => {
     setIsLinking(true);
-    const linkUrl = new URL("/api/steam/link", config.API_URL);
+    const linkUrl = new URL("/api/steam/link", apiBaseUrl);
     window.location.href = linkUrl.toString();
   };
 
