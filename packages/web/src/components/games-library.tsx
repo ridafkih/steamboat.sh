@@ -1,17 +1,10 @@
-import { useEffect, useState } from "react";
-import { apiClient } from "@/lib/api";
+import { useState } from "react";
+import { useGames } from "@/lib/hooks/use-games";
 
 type Game = {
   appId: number;
   name: string;
   headerImageUrl: string | null;
-};
-
-type OwnedGame = {
-  steamAccountId: number;
-  appId: number;
-  playtimeForever: number | null;
-  game: Game;
 };
 
 const getVerticalCapsuleUrl = (appId: number) =>
@@ -21,23 +14,7 @@ const getHeaderUrl = (appId: number) =>
   `https://steamcdn-a.akamaihd.net/steam/apps/${appId}/header.jpg`;
 
 export const GamesLibrary = () => {
-  const [games, setGames] = useState<OwnedGame[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchGames = async () => {
-      try {
-        const result = await apiClient.library.myGames();
-        setGames(result);
-      } catch (error) {
-        console.error("Failed to fetch games:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchGames();
-  }, []);
+  const { data: games, isLoading, error } = useGames();
 
   if (isLoading) {
     return (
@@ -47,7 +24,18 @@ export const GamesLibrary = () => {
     );
   }
 
-  if (games.length === 0) {
+  if (error) {
+    return (
+      <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2">
+        <p className="text-lg font-medium">Failed to load games</p>
+        <p className="text-muted-foreground">
+          There was an error loading your library.
+        </p>
+      </div>
+    );
+  }
+
+  if (!games || games.length === 0) {
     return (
       <div className="flex min-h-[50vh] flex-col items-center justify-center gap-2">
         <p className="text-lg font-medium">No games found</p>

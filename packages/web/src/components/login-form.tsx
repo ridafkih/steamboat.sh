@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -8,7 +10,10 @@ export const LoginForm = ({
   className,
   ...props
 }: React.ComponentProps<"div">) => {
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleDiscordLogin = async () => {
+    setIsLoading(true);
     await signIn.social({
       provider: "discord",
       callbackURL: window.location.origin,
@@ -30,9 +35,16 @@ export const LoginForm = ({
         type="button"
         className="mt-2 w-full"
         onClick={handleDiscordLogin}
+        disabled={isLoading}
       >
-        <DiscordLogo className="size-5" />
-        Continue with Discord
+        {isLoading ? (
+          <Loader2 className="size-5 animate-spin" />
+        ) : (
+          <>
+            <DiscordLogo className="size-5" />
+            Continue with Discord
+          </>
+        )}
       </Button>
       <Separator className="my-2" />
       <p className="text-center text-xs text-muted-foreground font-light tracking-tight leading-loose">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Gamepad, Lock } from "lucide-react";
 import SteamIcon from "@/assets/steam.svg?react";
 import {
@@ -12,38 +12,15 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/api";
-
-type SteamAccount = {
-  id: number;
-  steamId: string;
-  steamUsername: string;
-  steamAvatar: string | null;
-  profileUrl: string | null;
-};
+import { useLinkedAccounts } from "@/lib/hooks/use-linked-accounts";
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? "http://localhost:3001";
 
 export const LinkSteamAccountCard = () => {
-  const [steamAccounts, setSteamAccounts] = useState<SteamAccount[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const { data: steamAccounts, isLoading, mutate } = useLinkedAccounts();
   const [unlinkingAccountId, setUnlinkingAccountId] = useState<number | null>(
     null,
   );
-
-  const fetchSteamAccounts = async () => {
-    try {
-      const accounts = await apiClient.steam.linkedAccounts();
-      setSteamAccounts(accounts);
-    } catch (error) {
-      console.error("Failed to fetch Steam accounts:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchSteamAccounts();
-  }, []);
 
   const handleLinkSteam = () => {
     const linkUrl = new URL("/api/steam/link", apiBaseUrl);
@@ -55,9 +32,7 @@ export const LinkSteamAccountCard = () => {
     try {
       const result = await apiClient.steam.unlink({ steamAccountId });
       if (result.success) {
-        setSteamAccounts((previous) =>
-          previous.filter((account) => account.id !== steamAccountId),
-        );
+        await mutate();
       }
     } catch (error) {
       console.error("Failed to unlink Steam account:", error);
@@ -76,7 +51,7 @@ export const LinkSteamAccountCard = () => {
     );
   }
 
-  if (steamAccounts.length > 0) {
+  if (steamAccounts && steamAccounts.length > 0) {
     return (
       <Card>
         <CardHeader>
