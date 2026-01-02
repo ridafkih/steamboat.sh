@@ -131,15 +131,18 @@ export const LinkSteamAccountCard = () => {
     <Card className="gap-8">
       <CardContent className="flex flex-col gap-8">
         <div className="flex flex-col gap-3">
-          <div className="relative w-fit">
-            <div className="flex size-12 p-2 items-center justify-center rounded-full bg-white/10">
-              <SteamIcon className="fill-white" />
-            </div>
-          </div>
-
           <div className="flex items-center gap-2">
-            <CardTitle className="text-2xl">Link your Steam Account</CardTitle>
+            <div className="relative w-fit">
+              <div className="flex size-12 p-2 items-center justify-center rounded-full bg-white/10">
+                <SteamIcon className="fill-white" />
+              </div>
+            </div>
+            <CardTitle className="text-2xl">Link Steam</CardTitle>
           </div>
+          <CardDescription>
+            Linking your Steam account is required to inventory and keep track
+            of your library.
+          </CardDescription>
         </div>
 
         <div className="flex flex-col gap-4">

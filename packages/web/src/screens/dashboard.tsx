@@ -77,7 +77,7 @@ export const DashboardScreen = ({ user }: DashboardScreenProps) => {
 
   return (
     <div className="min-h-svh">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
           <p className="text-lg font-semibold">Steamboat</p>
           <div className="flex items-center gap-3">
