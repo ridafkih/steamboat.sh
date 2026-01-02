@@ -95,6 +95,7 @@ jobs:
           - service: "@steamboat/api"
           - service: "@steamboat/bot"
           - service: "@steamboat/cron"
+          - service: "@steamboat/web"
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
     steps:
