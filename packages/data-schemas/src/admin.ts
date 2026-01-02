@@ -16,8 +16,13 @@ export const adminCompareDiscordUsersSchema = type({
   targetDiscordId: "string",
 });
 
+export const adminDiscordIdSchema = type({
+  discordId: "string",
+});
+
 export type AdminUserId = typeof adminUserIdSchema.infer;
 export type AdminUsersQuery = typeof adminUsersQuerySchema.infer;
 export type AdminGameId = typeof adminGameIdSchema.infer;
 export type AdminServerId = typeof adminServerIdSchema.infer;
 export type AdminCompareDiscordUsers = typeof adminCompareDiscordUsersSchema.infer;
+export type AdminDiscordId = typeof adminDiscordIdSchema.infer;

@@ -14,7 +14,7 @@ import {
   type InteractionLogger,
 } from "@steamboat/log";
 
-const compareCommand = new SlashCommandBuilder()
+const steamboatCommand = new SlashCommandBuilder()
   .setName("steamboat")
   .setDescription("Steamboat commands")
   .addSubcommand((subcommand) =>
@@ -26,6 +26,16 @@ const compareCommand = new SlashCommandBuilder()
           .setName("user")
           .setDescription("The user to compare your library with")
           .setRequired(true),
+      ),
+  )
+  .addSubcommand((subcommand) =>
+    subcommand
+      .setName("profile")
+      .setDescription("Get a link to your or another user's Steam profile")
+      .addUserOption((option) =>
+        option
+          .setName("user")
+          .setDescription("The user whose Steam profile to show (defaults to yourself)"),
       ),
   );
 
@@ -42,6 +52,7 @@ entry("bot")
       credentials: "omit",
       apiKey: env.API_KEY,
     });
+
     return { discordToken: env.DISCORD_TOKEN, api, webUrl: env.WEB_URL };
   })
   .run(async ({ discordToken, api, webUrl, log, context }) => {
@@ -60,7 +71,7 @@ entry("bot")
 
     const rest = new REST().setToken(discordToken);
     await rest.put(Routes.applicationCommands(readyClient.user.id), {
-      body: [compareCommand.toJSON()],
+      body: [steamboatCommand.toJSON()],
     });
 
     const handleCompareCommand = async (
@@ -167,6 +178,69 @@ entry("bot")
       });
     };
 
+    const handleProfileCommand = async (
+      interaction: ChatInputCommandInteraction,
+      interactionLogger: InteractionLogger,
+    ) => {
+      const targetUser = interaction.options.getUser("user") ?? interaction.user;
+      const isSelf = targetUser.id === interaction.user.id;
+
+      interactionLogger.setAll({
+        targetUserId: targetUser.id,
+        targetUserTag: targetUser.tag,
+        isSelf,
+      });
+
+      if (targetUser.bot) {
+        interactionLogger.setAll({
+          outcome: "user_error",
+          responseType: "bot_profile",
+        });
+        await interaction.reply({
+          content: "Bots don't have Steam profiles!",
+          ephemeral: true,
+        });
+        return;
+      }
+
+      await interaction.deferReply({ ephemeral: true });
+
+      const profile = await api.admin.discord.getSteamProfile({
+        discordId: targetUser.id,
+      });
+
+      if (!profile.found) {
+        interactionLogger.setAll({
+          outcome: "user_error",
+          responseType: "no_steam_linked",
+        });
+        if (isSelf) {
+          const loginUrl = new URL("/login", webUrl);
+          await interaction.editReply({
+            content: `You haven't linked your Steam account yet!\n${loginUrl}`,
+          });
+        } else {
+          await interaction.editReply({
+            content: `<@${targetUser.id}> hasn't linked their Steam account to Steamboat yet.`,
+          });
+        }
+        return;
+      }
+
+      interactionLogger.setAll({
+        outcome: "success",
+        responseType: "profile_link",
+        steamId: profile.steamId,
+      });
+
+      const profileUrl = `https://steamcommunity.com/profiles/${profile.steamId}`;
+      await interaction.editReply({
+        content: isSelf
+          ? `Your Steam profile: ${profileUrl}`
+          : `<@${targetUser.id}>'s Steam profile: ${profileUrl}`,
+      });
+    };
+
     client.on(Events.InteractionCreate, async (interaction) => {
       if (!interaction.isChatInputCommand()) return;
 
@@ -180,32 +254,35 @@ entry("bot")
         invokerTag: interaction.user.tag,
       });
 
-      if (
-        interaction.commandName === "steamboat" &&
-        interaction.options.getSubcommand() === "compare"
-      ) {
-        try {
+      if (interaction.commandName !== "steamboat") return;
+
+      const subcommand = interaction.options.getSubcommand();
+
+      try {
+        if (subcommand === "compare") {
           await handleCompareCommand(interaction, interactionLogger);
-        } catch (error) {
-          interactionLogger.setAll({
-            outcome: "error",
-            error: {
-              type: error instanceof Error ? error.name : "UnknownError",
-              message: error instanceof Error ? error.message : String(error),
-              stack: error instanceof Error ? error.stack : undefined,
-            },
-          });
-
-          const errorMessage = "Something went wrong. Please try again later.";
-
-          if (interaction.deferred) {
-            await interaction.editReply({ content: errorMessage });
-          } else {
-            await interaction.reply({ content: errorMessage, ephemeral: true });
-          }
-        } finally {
-          interactionLogger.emit();
+        } else if (subcommand === "profile") {
+          await handleProfileCommand(interaction, interactionLogger);
         }
+      } catch (error) {
+        interactionLogger.setAll({
+          outcome: "error",
+          error: {
+            type: error instanceof Error ? error.name : "UnknownError",
+            message: error instanceof Error ? error.message : String(error),
+            stack: error instanceof Error ? error.stack : undefined,
+          },
+        });
+
+        const errorMessage = "Something went wrong. Please try again later.";
+
+        if (interaction.deferred) {
+          await interaction.editReply({ content: errorMessage });
+        } else {
+          await interaction.reply({ content: errorMessage, ephemeral: true });
+        }
+      } finally {
+        interactionLogger.emit();
       }
     });
   });

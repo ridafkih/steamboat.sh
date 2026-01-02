@@ -66,9 +66,9 @@ export const syncSteamGames = async (
         appId: steamGame.appid,
         playtimeForever: steamGame.playtime_forever,
         playtimeRecent: steamGame.playtime_2weeks ?? 0,
-        playtimeWindows: steamGame.playtime_windows_forever,
-        playtimeMac: steamGame.playtime_mac_forever,
-        playtimeLinux: steamGame.playtime_linux_forever,
+        playtimeWindows: steamGame.playtime_windows_forever ?? 0,
+        playtimeMac: steamGame.playtime_mac_forever ?? 0,
+        playtimeLinux: steamGame.playtime_linux_forever ?? 0,
         lastPlayedAt: steamGame.rtime_last_played
           ? new Date(steamGame.rtime_last_played * 1000)
           : null,
@@ -79,9 +79,9 @@ export const syncSteamGames = async (
         .set({
           playtimeForever: steamGame.playtime_forever,
           playtimeRecent: steamGame.playtime_2weeks ?? 0,
-          playtimeWindows: steamGame.playtime_windows_forever,
-          playtimeMac: steamGame.playtime_mac_forever,
-          playtimeLinux: steamGame.playtime_linux_forever,
+          playtimeWindows: steamGame.playtime_windows_forever ?? 0,
+          playtimeMac: steamGame.playtime_mac_forever ?? 0,
+          playtimeLinux: steamGame.playtime_linux_forever ?? 0,
           lastPlayedAt: steamGame.rtime_last_played
             ? new Date(steamGame.rtime_last_played * 1000)
             : null,

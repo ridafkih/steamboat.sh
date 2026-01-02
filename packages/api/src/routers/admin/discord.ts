@@ -8,6 +8,7 @@ import {
 import {
   adminServerIdSchema,
   adminCompareDiscordUsersSchema,
+  adminDiscordIdSchema,
 } from "@steamboat/data-schemas";
 import { adminProcedure } from "../../orpc";
 
@@ -130,10 +131,43 @@ export const compareDiscordUsers = adminProcedure
     };
   });
 
+export const getSteamProfile = adminProcedure
+  .input(adminDiscordIdSchema)
+  .handler(async ({ input, context }) => {
+    const discordAccount = await context.database.query.accounts.findFirst({
+      where: and(
+        eq(accounts.accountId, input.discordId),
+        eq(accounts.providerId, "discord"),
+      ),
+    });
+
+    if (!discordAccount) {
+      return { found: false as const };
+    }
+
+    const userSteamAccounts = await context.database.query.steamAccounts.findMany({
+      where: eq(steamAccounts.userId, discordAccount.userId),
+    });
+
+    if (userSteamAccounts.length === 0) {
+      return { found: false as const };
+    }
+
+    const primaryAccount = userSteamAccounts[0];
+
+    return {
+      found: true as const,
+      steamId: primaryAccount.steamId,
+      steamUsername: primaryAccount.steamUsername,
+      steamAvatar: primaryAccount.steamAvatar,
+    };
+  });
+
 export const adminDiscordRouter = {
   servers: {
     users: getServerUsers,
     games: getServerGames,
   },
   compareUsers: compareDiscordUsers,
+  getSteamProfile: getSteamProfile,
 };
