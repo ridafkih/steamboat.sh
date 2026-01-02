@@ -5,8 +5,8 @@ export type RequestContext = {
   method: string;
   path: string;
   startTime: number;
-  userId?: number;
-  discordId?: string;
+  userId?: string;
+  discordAccountId?: string;
   steamAccountId?: number;
   error?: {
     type: string;

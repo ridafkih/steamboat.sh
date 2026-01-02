@@ -17,8 +17,13 @@ const DEFAULT_REDACT_PATHS = [
   "*.ssn",
   "*.privateKey",
   "*.private_key",
+  "*.clientSecret",
+  "*.client_secret",
   "env.DATABASE_URL",
   "env.DISCORD_TOKEN",
+  "env.DISCORD_CLIENT_ID",
+  "env.DISCORD_CLIENT_SECRET",
+  "env.BETTER_AUTH_SECRET",
   "env.API_KEY",
 ];
 
