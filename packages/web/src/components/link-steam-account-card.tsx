@@ -12,8 +12,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { apiClient } from "@/lib/api";
-import { config } from "@/lib/config";
 import { useLinkedAccounts } from "@/lib/hooks/use-linked-accounts";
+
+const apiBaseUrl = import.meta.env.VITE_API_URL;
 
 export const LinkSteamAccountCard = () => {
   const { data: steamAccounts, isLoading, mutate } = useLinkedAccounts();
