@@ -77,27 +77,17 @@ export const DashboardScreen = ({ user }: DashboardScreenProps) => {
 
   return (
     <div className="min-h-svh">
-      <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3">
-          <p className="text-lg font-semibold">Steamboat</p>
+      <header className="bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="mx-auto max-w-3xl flex items-center justify-between px-4 py-3">
+          <p className="text-md font-medium tracking-tighter">Steamboat</p>
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
-              {user.image && (
-                <img
-                  src={user.image}
-                  alt={user.name}
-                  className="size-8 rounded-full"
-                />
-              )}
-              <span className="text-sm">{user.name}</span>
-            </div>
             <Button variant="outline" size="sm" onClick={handleSignOut}>
               Sign out
             </Button>
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-8">
+      <main className="mx-auto max-w-3xl px-4">
         <GamesLibrary />
       </main>
     </div>

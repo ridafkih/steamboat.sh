@@ -23,7 +23,7 @@ export const LoginForm = ({
       <h1 className="text-xl font-normal">Welcome to Steamboat</h1>
       <p className="text-center text-sm text-muted-foreground tracking-wide leading-6 font-light">
         Share your game library with users on Discord without having to share
-        your account or leave Discord.
+        your account.
       </p>
       <Button
         variant="outline"

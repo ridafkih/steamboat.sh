@@ -61,13 +61,14 @@ export const GamesLibrary = () => {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">Games</h1>
+        <h1 className="text-2xl font-light tracking-tight">Games</h1>
         <p className="text-muted-foreground">
-          Your Steam library with {games.length} games ready to share with friends.
+          Your Steam library with {games.length} games ready to share with
+          friends.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+      <div className="grid grid-cols-2 gap-1 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {games.map((ownedGame) => (
           <GameCard key={ownedGame.appId} game={ownedGame.game} />
         ))}
@@ -84,17 +85,21 @@ const GameCard = ({ game }: { game: Game }) => {
   };
 
   return (
-    <div className="group relative overflow-hidden rounded-lg border bg-card transition-transform hover:scale-105">
-      <div className="aspect-[2/3]">
+    <div className="group relative overflow-hidden">
+      <div className="aspect-2/3 overflow-hidden bg-card border rounded-sm">
         <img
-          src={imageError ? getHeaderUrl(game.appId) : getVerticalCapsuleUrl(game.appId)}
+          src={
+            imageError
+              ? getHeaderUrl(game.appId)
+              : getVerticalCapsuleUrl(game.appId)
+          }
           alt={game.name}
-          className="size-full object-cover"
+          className="size-full object-cover group-hover:scale-102 transition-transform duration-150"
           onError={handleImageError}
           loading="lazy"
         />
       </div>
-      <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+      <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/80 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
         <p className="truncate text-sm font-medium text-white">{game.name}</p>
       </div>
     </div>
