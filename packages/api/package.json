@@ -17,6 +17,7 @@
     "@orpc/client": "^1.0.0",
     "@steam-eye/database": "workspace:*",
     "@steam-eye/data-schemas": "workspace:*",
+    "@steam-eye/entry-point": "workspace:*",
     "@steam-eye/log": "workspace:*",
     "drizzle-orm": "0.45.1"
   },
