@@ -3,6 +3,8 @@
   "extends": ["//"],
   "tasks": {
     "start": {
+      "dependsOn": [],
+      "cache": false,
       "passThroughEnv": [
         "DISCORD_TOKEN",
         "API_URL",

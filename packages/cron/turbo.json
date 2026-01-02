@@ -3,6 +3,8 @@
   "extends": ["//"],
   "tasks": {
     "start": {
+      "dependsOn": [],
+      "cache": false,
       "passThroughEnv": [
         "DATABASE_URL",
         "STEAM_API_KEY"
