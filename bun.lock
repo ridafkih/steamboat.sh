@@ -111,6 +111,7 @@
       "dependencies": {
         "@steamboat/data-schemas": "workspace:*",
         "@steamboat/database": "workspace:*",
+        "@steamboat/log": "workspace:*",
         "drizzle-orm": "0.45.1",
         "node-steam-openid": "^2.0.0",
       },

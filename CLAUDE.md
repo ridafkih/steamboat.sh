@@ -14,6 +14,7 @@ Default to using Bun instead of Node.js.
 - Use `bunx <package> <command>` instead of `npx <package> <command>`
 - Bun automatically loads .env, so don't use dotenv.
 - Always construct URLs using `new URL`, rather than concatenating.
+- We use the wide-logging pattern for logging with Pino. Use the codebase as a reference, and check https://loggingsucks.com/
 
 ## Code Style
 

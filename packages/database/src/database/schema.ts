@@ -129,6 +129,12 @@ export const games = pgTable("games", {
   releaseDate: text("release_date"),
   isFree: boolean("is_free").default(false),
   cachedAt: timestamp("cached_at").notNull().defaultNow(),
+  priceCurrency: text("price_currency"),
+  priceInitial: integer("price_initial"),
+  priceFinal: integer("price_final"),
+  priceDiscountPercent: integer("price_discount_percent"),
+  priceLastFetchedAt: timestamp("price_last_fetched_at"),
+  priceFetchAttempts: integer("price_fetch_attempts").default(0),
 });
 
 export const gamesRelations = relations(games, ({ many }) => ({

@@ -237,6 +237,52 @@ export const checkDiscordLinkStatus = publicProcedure
     };
   });
 
+export const getLibraryValue = authedProcedure.handler(async ({ context }) => {
+  const userSteamAccounts = await context.database.query.steamAccounts.findMany({
+    where: eq(steamAccounts.userId, context.userId),
+  });
+
+  const accountIds = userSteamAccounts.map((account) => account.id);
+
+  if (accountIds.length === 0) {
+    return { totalInitial: 0, totalFinal: 0, gameCount: 0, gamesWithPrice: 0 };
+  }
+
+  const games = await context.database.query.ownedGames.findMany({
+    where: and(
+      inArray(ownedGames.steamAccountId, accountIds),
+      eq(ownedGames.hidden, false),
+    ),
+    with: { game: true },
+  });
+
+  const uniqueGames = new Map<number, typeof games[number]["game"]>();
+  for (const ownedGame of games) {
+    if (!uniqueGames.has(ownedGame.appId)) {
+      uniqueGames.set(ownedGame.appId, ownedGame.game);
+    }
+  }
+
+  let totalInitial = 0;
+  let totalFinal = 0;
+  let gamesWithPrice = 0;
+
+  for (const game of uniqueGames.values()) {
+    if (game.priceInitial !== null && game.priceFinal !== null) {
+      totalInitial += game.priceInitial;
+      totalFinal += game.priceFinal;
+      gamesWithPrice++;
+    }
+  }
+
+  return {
+    totalInitial,
+    totalFinal,
+    gameCount: uniqueGames.size,
+    gamesWithPrice,
+  };
+});
+
 export const libraryRouter = {
   myGames: listMyGames,
   userGames: listUserGames,
@@ -244,4 +290,5 @@ export const libraryRouter = {
   compareByDiscordId: compareByDiscordId,
   setVisibility: setGameVisibility,
   checkDiscordLinkStatus: checkDiscordLinkStatus,
+  value: getLibraryValue,
 };

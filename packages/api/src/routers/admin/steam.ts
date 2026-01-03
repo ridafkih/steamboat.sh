@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm";
 import { games, ownedGames, steamAccounts } from "@steamboat/database/schema";
 import { adminGameIdSchema } from "@steamboat/data-schemas";
-import { syncSteamGames } from "@steamboat/steam";
+import { syncSteamGames, syncMissingGamePrices } from "@steamboat/steam";
 import { adminProcedure } from "../../orpc";
 
 export const listGames = adminProcedure.handler(async ({ context }) => {
@@ -83,6 +83,16 @@ export const syncAll = adminProcedure.handler(async ({ context }) => {
   };
 });
 
+export const syncPrices = adminProcedure.handler(async ({ context }) => {
+  const result = await syncMissingGamePrices(context.database);
+
+  context.log.set("pricesSyncTotal", result.total);
+  context.log.set("pricesSyncSucceeded", result.succeeded);
+  context.log.set("pricesSyncFailed", result.failed);
+
+  return result;
+});
+
 export const adminSteamRouter = {
   games: {
     list: listGames,
@@ -90,4 +100,5 @@ export const adminSteamRouter = {
     owners: getGameOwners,
   },
   syncAll,
+  syncPrices,
 };

@@ -12,9 +12,13 @@ export type CompareResult = Awaited<
   ReturnType<typeof apiClient.library.compareByDiscordId>
 >;
 
+export type LibraryValue = Awaited<ReturnType<typeof apiClient.library.value>>;
+
 export const fetchLinkedAccounts = () => apiClient.steam.linkedAccounts();
 
 export const fetchGames = () => apiClient.library.myGames();
+
+export const fetchLibraryValue = () => apiClient.library.value();
 
 export const fetchCompareByDiscordId = (discordId: string) =>
   apiClient.library.compareByDiscordId({ discordId });

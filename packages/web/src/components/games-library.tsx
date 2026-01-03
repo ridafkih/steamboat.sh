@@ -1,10 +1,18 @@
 import { useState } from "react";
 import { useGames } from "@/lib/hooks/use-games";
+import { useLibraryValue } from "@/lib/hooks/use-library-value";
 
 type Game = {
   appId: number;
   name: string;
   headerImageUrl: string | null;
+};
+
+const formatPrice = (cents: number) => {
+  return (cents / 100).toLocaleString(undefined, {
+    style: "currency",
+    currency: "USD",
+  });
 };
 
 const getVerticalCapsuleUrl = (appId: number) =>
@@ -15,6 +23,7 @@ const getHeaderUrl = (appId: number) =>
 
 export const GamesLibrary = () => {
   const { data: games, isLoading, error } = useGames();
+  const { data: libraryValue } = useLibraryValue();
 
   if (isLoading) {
     return (
@@ -48,6 +57,15 @@ export const GamesLibrary = () => {
 
   return (
     <div className="flex flex-col gap-6">
+      {libraryValue && libraryValue.gamesWithPrice > 0 && (
+        <div className="flex flex-col gap-1 rounded-lg border bg-card p-4">
+          <p className="text-sm text-muted-foreground">Library Value</p>
+          <p className="text-3xl font-semibold tracking-tight">
+            {formatPrice(libraryValue.totalInitial)}
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col gap-1">
         <h1 className="text-2xl font-light tracking-tight">Games</h1>
         <p className="text-muted-foreground">

@@ -28,3 +28,23 @@ export const steamOwnedGamesResponseSchema = type({
 });
 
 export type SteamOwnedGamesResponse = typeof steamOwnedGamesResponseSchema.infer;
+
+export const steamPriceOverviewSchema = type({
+  currency: "string",
+  initial: "number",
+  final: "number",
+  discount_percent: "number",
+  initial_formatted: "string",
+  final_formatted: "string",
+});
+
+export type SteamPriceOverview = typeof steamPriceOverviewSchema.infer;
+
+export const steamAppDetailsResponseSchema = type({
+  success: "boolean",
+  "data?": {
+    "price_overview?": steamPriceOverviewSchema,
+  },
+});
+
+export type SteamAppDetailsResponse = typeof steamAppDetailsResponseSchema.infer;

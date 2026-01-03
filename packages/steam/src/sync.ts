@@ -2,6 +2,7 @@ import { and, eq } from "drizzle-orm";
 import { games, ownedGames, steamAccounts } from "@steamboat/database/schema";
 import type { DatabaseClient } from "@steamboat/database";
 import { steamOwnedGamesResponseSchema } from "@steamboat/data-schemas";
+import { syncGamePrices } from "./prices";
 
 const buildSteamIconUrl = (appId: number, iconHash: string) =>
   `https://media.steampowered.com/steamcommunity/public/images/apps/${appId}/${iconHash}.jpg`;
@@ -37,6 +38,8 @@ export const syncSteamGames = async (
     return 0;
   }
 
+  const newGameAppIds: number[] = [];
+
   for (const steamGame of steamGames) {
     const existingGame = await database.query.games.findFirst({
       where: eq(games.appId, steamGame.appid),
@@ -51,6 +54,7 @@ export const syncSteamGames = async (
           : null,
         headerImageUrl: buildHeaderImageUrl(steamGame.appid),
       });
+      newGameAppIds.push(steamGame.appid);
     }
 
     const existingOwned = await database.query.ownedGames.findFirst({
@@ -100,6 +104,10 @@ export const syncSteamGames = async (
     .update(steamAccounts)
     .set({ lastSyncedAt: new Date() })
     .where(eq(steamAccounts.id, steamAccountId));
+
+  if (newGameAppIds.length > 0) {
+    await syncGamePrices(database, newGameAppIds);
+  }
 
   return steamGames.length;
 };
