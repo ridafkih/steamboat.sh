@@ -31,12 +31,11 @@ export default ({ api, webUrl }: CommandContext): SubcommandDefinition => ({
       });
       await interaction.reply({
         content: "Bots don't have Steam profiles!",
-        flags: MessageFlags.Ephemeral,
       });
       return;
     }
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    await interaction.deferReply();
 
     const profile = await api.admin.discord.getSteamProfile({
       discordId: targetUser.id,
