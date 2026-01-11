@@ -18,6 +18,7 @@ RUN bun build packages/api/src/index.ts --outdir packages/api/dist --target bun
 FROM base AS runtime
 COPY --from=prune /app/out/json/ .
 RUN bun install --frozen-lockfile --production
+COPY --from=build /app/packages/api/scripts ./packages/api/scripts
 COPY --from=build /app/packages/api/dist ./packages/api/dist
 COPY --from=build /app/packages/database/src ./packages/database/src
 COPY --from=build /app/packages/database/drizzle.config.ts ./packages/database/
