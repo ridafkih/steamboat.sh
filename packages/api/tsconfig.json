@@ -1,4 +1,4 @@
 {
   "extends": "@steamboat/typescript-config",
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "scripts/**/*"],
 }
