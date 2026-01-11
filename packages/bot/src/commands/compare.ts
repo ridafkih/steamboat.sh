@@ -43,12 +43,12 @@ export default ({ api, webUrl }: CommandContext): SubcommandDefinition => ({
       });
       await interaction.reply({
         content: "You can't compare your library with a bot!",
-        flags: MessageFlags.Ephemeral,
+
       });
       return;
     }
 
-    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
+    await interaction.deferReply();
 
     const [invokerStatus, targetStatus] = await Promise.all([
       api.library.checkDiscordLinkStatus({ discordId: invokerId }),
