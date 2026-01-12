@@ -23,6 +23,7 @@ COPY --from=build /app/packages/api/dist ./packages/api/dist
 COPY --from=build /app/packages/database/src ./packages/database/src
 COPY --from=build /app/packages/database/drizzle.config.ts ./packages/database/
 COPY --from=source /app/packages/database/drizzle ./packages/database/drizzle
+COPY --from=source /app/packages/database/drizzle ./packages/api/drizzle
 COPY --from=source /app/packages/api/entrypoint.sh ./packages/api/entrypoint.sh
 RUN chmod +x ./packages/api/entrypoint.sh
 
