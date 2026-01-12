@@ -21,7 +21,6 @@
     "@steamboat/log": "workspace:*",
     "@steamboat/steam": "workspace:*",
     "better-auth": "^1.4.10",
-    "drizzle-kit": "^0.31.8",
     "drizzle-orm": "0.45.1",
     "pg": "^8.16.3"
   },
